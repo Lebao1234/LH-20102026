@@ -2,120 +2,277 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>20/10 nhà LightHuman</title>
-  <meta name="description" content="Một hộp quà 20/10 từ BD Hệ thống gửi các chị em nhà LightHuman: luôn rực rỡ, tiền đầy đủ, niềm vui đầy người, không đầy KPI, dồi dào hạnh phúc." />
-  <meta name="theme-color" content="#faf9f6" />
+  <meta name="description" content="BD Hệ thống gửi tất cả các bạn, các chị em nhà LightHuman một bó hoa 20/10 cùng bốn lời chúc: rạng rỡ, tươi vui, bình an và hạnh phúc." />
+  <meta name="theme-color" content="#000000" />
   <link rel="preload" href="Chamhoa.mp3" as="audio" type="audio/mpeg" />
   <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- Ambient background elements -->
-  <div class="bg-silk" aria-hidden="true"></div>
-  <div class="bg-corner bg-corner--left" aria-hidden="true"></div>
-  <div class="bg-corner bg-corner--right" aria-hidden="true"></div>
-  <canvas id="petals" class="petals" aria-hidden="true"></canvas>
+  <div class="bg" aria-hidden="true"></div>
+  <canvas id="fx" class="fx" aria-hidden="true"></canvas>
 
   <audio id="song" src="Chamhoa.mp3" loop preload="auto"></audio>
 
-  <!-- STAGE 1: Cute 3D Pastel Gift Box Home -->
+  <!-- ===== STAGE 1: hộp quà neon ===== -->
   <section class="order" id="order" aria-labelledby="orderTitle">
-    <div class="gift-hero">
-      <header class="order__header">
-        <h1 class="order__title" id="orderTitle">Hộp quà 20/10</h1>
-        <p class="order__kicker">Gửi các chị em nhà LightHuman</p>
-      </header>
+    <header class="order__header">
+      <h1 class="order__title" id="orderTitle">Hộp quà <span class="neon">20/10</span></h1>
+      <p class="order__kicker">Gửi các chị em nhà LightHuman</p>
+    </header>
 
-      <div class="gift-wrapper">
-        <div class="gift-glow" aria-hidden="true"></div>
-        <button class="gift-btn" type="button" id="gift" aria-label="Mở hộp quà">
-          <img src="gift_box_transparent.png" alt="Hộp quà 20/10" class="gift-img" />
-        </button>
-      </div>
+    <!-- Hộp quà chỉ là hình minh họa bấm được; nút chính bên dưới mới là điểm dừng bàn phím -->
+    <button class="gift" type="button" id="gift" tabindex="-1" aria-hidden="true">
+      <svg class="gift__svg" viewBox="0 0 200 200" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <ellipse class="gift__floor" cx="100" cy="186" rx="70" ry="7" />
+        <g class="gift__body">
+          <rect x="42" y="96" width="116" height="84" rx="7" class="ln-pink fill-pink" />
+          <path d="M100 96 V180" class="ln-lilac" />
+        </g>
+        <g class="gift__lid">
+          <rect x="32" y="74" width="136" height="24" rx="7" class="ln-pink fill-pink" />
+          <path d="M100 74 V98" class="ln-lilac" />
+          <path d="M100 74 C82 44 56 52 70 68 C78 76 92 76 100 74 Z" class="ln-lilac fill-lilac" />
+          <path d="M100 74 C118 44 144 52 130 68 C122 76 108 76 100 74 Z" class="ln-lilac fill-lilac" />
+          <circle cx="100" cy="74" r="5" class="ln-gold" />
+        </g>
+        <g class="gift__stars ln-gold thin">
+          <path d="M28 46 v10 M23 51 h10" />
+          <path d="M172 34 v8 M168 38 h8" />
+          <path d="M178 120 v8 M174 124 h8" />
+        </g>
+      </svg>
+    </button>
 
-      <button class="btn btn--open" type="button" id="openGift">
-        <i class="ph ph-gift" aria-hidden="true"></i> Mở hộp quà
+    <button class="btn" type="button" id="openGift">
+      <i class="ph-light ph-gift" aria-hidden="true"></i>
+      <span id="openLabel">Mở hộp quà</span>
+    </button>
+    <p class="order__note"><i class="ph-light ph-speaker-high" aria-hidden="true"></i> Bật loa lên để nghe nhạc nhé</p>
+  </section>
+
+  <!-- ===== STAGE 2: bó hoa neon & lời chúc ===== -->
+  <div class="stage2" id="stage2" hidden>
+  <main class="scene" id="scene" aria-labelledby="sceneTitle">
+    <div class="scene__center">
+      <button class="bouquet pop" type="button" id="bouquet" aria-label="Bó hoa 20/10, chạm để hoa nở thêm">
+        <svg class="bouquet__svg" viewBox="0 0 300 340" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <defs>
+            <g id="flw">
+              <ellipse cx="0" cy="-15" rx="7" ry="15" />
+              <ellipse cx="0" cy="-15" rx="7" ry="15" transform="rotate(60)" />
+              <ellipse cx="0" cy="-15" rx="7" ry="15" transform="rotate(120)" />
+              <ellipse cx="0" cy="-15" rx="7" ry="15" transform="rotate(180)" />
+              <ellipse cx="0" cy="-15" rx="7" ry="15" transform="rotate(240)" />
+              <ellipse cx="0" cy="-15" rx="7" ry="15" transform="rotate(300)" />
+            </g>
+          </defs>
+          <g class="bouquet__sway">
+            <g class="ln-mint">
+              <!-- Các cành hoa vươn từ đáy bình lên các hướng -->
+              <path class="stem" style="--d:.05s" pathLength="1" d="M150 296 C150 236 146 170 150 86" />
+              <path class="stem" style="--d:.1s" pathLength="1" d="M149 296 C147 230 124 130 116 56" />
+              <path class="stem" style="--d:.12s" pathLength="1" d="M151 296 C153 230 176 130 184 56" />
+              <path class="stem" style="--d:.15s" pathLength="1" d="M149 296 C146 238 116 186 90 124" />
+              <path class="stem" style="--d:.2s" pathLength="1" d="M151 296 C154 238 184 186 212 122" />
+              <path class="stem" style="--d:.25s" pathLength="1" d="M148 296 C138 236 82 170 52 128" />
+              <path class="stem" style="--d:.28s" pathLength="1" d="M152 296 C162 236 218 170 248 128" />
+              <path class="stem" style="--d:.32s" pathLength="1" d="M147 296 C143 248 104 222 62 182" />
+              <path class="stem" style="--d:.35s" pathLength="1" d="M153 296 C157 248 196 222 238 180" />
+              <path class="stem" style="--d:.38s" pathLength="1" d="M146 296 C136 256 80 236 36 202" />
+              <path class="stem" style="--d:.4s" pathLength="1" d="M154 296 C164 256 220 236 264 202" />
+
+              <!-- Các cành nhánh phụ đan xen -->
+              <path class="stem" style="--d:.42s" pathLength="1" d="M148 172 C140 158 132 150 124 144" />
+              <path class="stem" style="--d:.44s" pathLength="1" d="M152 172 C160 158 168 150 176 144" />
+              <path class="stem" style="--d:.46s" pathLength="1" d="M108 170 C96 160 84 154 74 150" />
+              <path class="stem" style="--d:.48s" pathLength="1" d="M192 170 C204 160 216 154 226 150" />
+
+              <!-- Cành lá xum xuê -->
+              <path class="leaf" style="--d:.52s" d="M120 232 q-28 -6 -32 -30 q26 2 32 30 Z" />
+              <path class="leaf" style="--d:.55s" d="M180 230 q28 -6 32 -30 q-26 2 -32 30 Z" />
+              <path class="leaf" style="--d:.58s" d="M68 214 q-22 4 -26 24 q18 -12 26 -24 Z" />
+              <path class="leaf" style="--d:.6s" d="M232 214 q22 4 26 24 q-18 -12 -26 -24 Z" />
+              <path class="leaf" style="--d:.62s" d="M86 190 q-20 -8 -20 -24 q18 4 20 24 Z" />
+              <path class="leaf" style="--d:.64s" d="M214 190 q20 -8 20 -24 q-18 4 -20 24 Z" />
+              <path class="leaf" style="--d:.66s" d="M148 185 q-18 -4 -20 -18 q16 2 20 18 Z" />
+              <path class="leaf" style="--d:.68s" d="M152 135 q18 -4 20 -18 q-16 2 -20 18 Z" />
+              <path class="leaf" style="--d:.7s" d="M126 95 q-15 -8 -14 -20 q15 5 13 20 Z" />
+              <path class="leaf" style="--d:.72s" d="M174 95 q15 -8 14 -20 q-15 5 -13 20 Z" />
+              <path class="leaf" style="--d:.74s" d="M124 144 q-12 -12 -22 -6 q10 14 22 6 Z" />
+              <path class="leaf" style="--d:.76s" d="M176 144 q12 -12 22 -6 q-10 14 -22 6 Z" />
+            </g>
+
+            <!-- Các bông hoa nở (4 màu đại diện 4 thành viên BD Hệ thống) -->
+            <!-- Pink: Minh Hùm - Rạng rỡ -->
+            <g class="ln-pink fill-pink" transform="translate(150 80) scale(1.22)"><use class="fl" style="--d:.5s" href="#flw" /></g>
+            <g class="ln-pink fill-pink" transform="translate(90 118) scale(.95)"><use class="fl" style="--d:.65s" href="#flw" /></g>
+
+            <!-- Lilac: Tuấn Kẹc - Bình an -->
+            <g class="ln-lilac fill-lilac" transform="translate(212 116) scale(.95)"><use class="fl" style="--d:.75s" href="#flw" /></g>
+            <g class="ln-lilac fill-lilac" transform="translate(62 176) scale(.78)"><use class="fl" style="--d:.8s" href="#flw" /></g>
+            <g class="ln-lilac fill-lilac" transform="translate(248 122) scale(.65)"><use class="fl" style="--d:.88s" href="#flw" /></g>
+
+            <!-- Gold: Hòn Trợn - Tươi vui -->
+            <g class="ln-gold fill-gold" transform="translate(238 174) scale(.78)"><use class="fl" style="--d:.95s" href="#flw" /></g>
+            <g class="ln-gold fill-gold" transform="translate(184 50) scale(.8)"><use class="fl" style="--d:.7s" href="#flw" /></g>
+
+            <!-- Mint: Lê Bống - Hạnh phúc -->
+            <g class="ln-mint fill-mint" transform="translate(116 50) scale(.8)"><use class="fl" style="--d:.6s" href="#flw" /></g>
+            <g class="ln-mint fill-mint" transform="translate(52 122) scale(.65)"><use class="fl" style="--d:.82s" href="#flw" /></g>
+
+            <!-- Nhụy hoa & nụ cành phát sáng -->
+            <g class="ln-gold fill-gold">
+              <circle class="fl" style="--d:.55s" cx="150" cy="80" r="7" />
+              <circle class="fl" style="--d:.7s" cx="90" cy="118" r="5" />
+              <circle class="fl" style="--d:.8s" cx="212" cy="116" r="5" />
+              <circle class="fl" style="--d:.65s" cx="116" cy="50" r="4.5" />
+              <circle class="fl" style="--d:.75s" cx="184" cy="50" r="4.5" />
+              <circle class="fl" style="--d:.85s" cx="62" cy="176" r="4" />
+              <circle class="fl" style="--d:.98s" cx="238" cy="174" r="4" />
+            </g>
+            <g class="ln-mint fill-mint">
+              <circle class="fl" style="--d:.85s" cx="52" cy="122" r="3.5" />
+              <circle class="fl" style="--d:.9s" cx="36" cy="202" r="3.5" />
+              <circle class="fl" style="--d:.9s" cx="264" cy="202" r="3.5" />
+            </g>
+            <g class="ln-lilac fill-lilac">
+              <circle class="fl" style="--d:.9s" cx="248" cy="122" r="3.5" />
+              <circle class="fl" style="--d:.85s" cx="124" cy="144" r="3" />
+              <circle class="fl" style="--d:.88s" cx="176" cy="144" r="3" />
+            </g>
+
+            <!-- Bình hoa neon trong suốt & nơ lụa -->
+            <path d="M76 224 L224 224 L166 324 Q150 336 134 324 Z" class="ln-pink fill-pink" />
+            <path d="M76 224 Q150 248 224 224" class="ln-pink thin" />
+            <path d="M112 236 L142 322 M188 236 L158 322" class="ln-pink thin dim" />
+            <path d="M150 260 q-30 -26 -40 -4 q10 20 40 4 q30 16 40 -4 q-10 -22 -40 4 Z" class="ln-lilac fill-lilac" />
+            <path d="M146 264 q-10 24 -22 38 M154 264 q10 24 22 38" class="ln-lilac" />
+          </g>
+        </svg>
       </button>
-      <p class="order__note"><i class="ph ph-speaker-high" aria-hidden="true"></i> Bật loa lên để nghe nhạc nhé</p>
+
+      <p class="scene__eyebrow pop">chúc mừng ngày phụ nữ việt nam</p>
+      <h2 class="scene__title pop" id="sceneTitle"><span class="neon">20/10</span></h2>
+      <a class="btn btn--letter pop" href="#letter">
+        <i class="ph-light ph-envelope-simple" aria-hidden="true"></i>
+        <span>Mở thư BD Hệ thống</span>
+      </a>
+    </div>
+
+    <!-- Hai bên bó hoa: trái là lời gửi, phải là ý nghĩa từng bông (màu khớp với người trao ở chương lời chúc) -->
+    <div class="scene__side scene__side--left pop">
+      <p class="scene__lead"><strong>BD Hệ thống</strong> xin gửi tặng tất cả các bạn, các chị em nhà LightHuman một bó hoa bự bành ki.</p>
+    </div>
+
+    <div class="scene__side scene__side--right pop">
+      <p class="scene__desc">Mỗi bông là một điều tụi mình mong:</p>
+      <ul class="meanings">
+        <li data-flower="pink"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg>Rạng rỡ</li>
+        <li data-flower="gold"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg>Tươi vui</li>
+        <li data-flower="lilac"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg>Bình an</li>
+        <li data-flower="mint"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg>Hạnh phúc</li>
+      </ul>
+    </div>
+
+
+  </main>
+
+  <!-- ===== Lá thư team Hệ thống: cuộn để xé niêm, thư trượt ra, rồi đọc từng người =====
+       Nội dung 4 lời chúc nằm ở mảng TEAM đầu file script.js -->
+  <section class="letter" id="letter" aria-labelledby="letterTitle">
+    <div class="letter__track" id="letterTrack">
+      <span class="letter__mark" data-step="torn" style="top: 18%" aria-hidden="true"></span>
+      <span class="letter__mark" data-step="out" style="top: 45%" aria-hidden="true"></span>
+
+      <div class="letter__sticky">
+        <h2 class="letter__title" id="letterTitle">Thư tay từ <span class="neon">BD Hệ thống</span></h2>
+
+        <div class="envelope">
+          <div class="env__back" aria-hidden="true"></div>
+
+          <div class="paper">
+            <p class="paper__greet">Gửi các chị em nhà LightHuman,</p>
+            <p class="paper__text">Bốn người, bốn bông hoa, bốn lời chúc. Đọc từng người bên dưới nhé.</p>
+            <div class="paper__team" id="paperTeam" aria-hidden="true"></div>
+          </div>
+
+          <svg class="env__front" viewBox="0 0 400 250" fill="none" stroke-linejoin="round" aria-hidden="true">
+            <path class="env__pocket" d="M0 55 L12.5 64 L25 55 L37.5 64 L50 55 L62.5 64 L75 55 L87.5 64 L100 55 L112.5 64 L125 55 L137.5 64 L150 55 L162.5 64 L175 55 L187.5 64 L200 55 L212.5 64 L225 55 L237.5 64 L250 55 L262.5 64 L275 55 L287.5 64 L300 55 L312.5 64 L325 55 L337.5 64 L350 55 L362.5 64 L375 55 L387.5 64 L400 55 L400 250 L0 250 Z" />
+            <path class="env__fold" d="M2 248 L200 150 L398 248" />
+          </svg>
+
+          <div class="env__strip" aria-hidden="true">
+            <svg viewBox="0 0 400 64" fill="none" stroke-linejoin="round">
+              <path class="env__band" d="M0 0 L400 0 L400 55 L387.5 64 L375 55 L362.5 64 L350 55 L337.5 64 L325 55 L312.5 64 L300 55 L287.5 64 L275 55 L262.5 64 L250 55 L237.5 64 L225 55 L212.5 64 L200 55 L187.5 64 L175 55 L162.5 64 L150 55 L137.5 64 L125 55 L112.5 64 L100 55 L87.5 64 L75 55 L62.5 64 L50 55 L37.5 64 L25 55 L12.5 64 L0 55 Z" />
+              <path class="env__flap" d="M2 2 L200 46 L398 2" />
+            </svg>
+            <span class="env__seal"><i class="ph-light ph-heart"></i></span>
+          </div>
+        </div>
+
+        <p class="letter__hint">Cuộn xuống để xé thư</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== Bốn bông hoa, bốn lời chúc: các trang thư xếp chồng khi cuộn ===== -->
+  <section class="wishes-team" id="wishesTeam" aria-labelledby="wishesTeamTitle">
+    <h2 class="chapter__title" id="wishesTeamTitle">Bốn bông hoa, <span class="neon">bốn lời chúc</span></h2>
+    <div class="notes" id="notes"></div>
+  </section>
+
+  <!-- ===== Ảnh tập thể cả nhà: hai polaroid "rửa ảnh" theo nhịp cuộn ===== -->
+  <section class="photo" id="photo" aria-labelledby="photoTitle">
+    <div class="photo__track" id="photoTrack">
+      <span class="photo__mark" style="top: 70%" aria-hidden="true"></span>
+      <div class="photo__sticky">
+        <h2 class="chapter__title photo__title" id="photoTitle">Và đây là <span class="neon">cả nhà mình</span></h2>
+        <div class="polaroids">
+          <figure class="polaroid polaroid--1">
+            <div class="polaroid__img">
+              <img src="img/tapthe-1.jpg" width="1600" height="1200" alt="Ảnh tập thể cả nhà LightHuman tại văn phòng, mọi người cùng giơ tay chữ V" decoding="async" />
+            </div>
+            <figcaption class="polaroid__caption">Cả nhà LightHuman</figcaption>
+          </figure>
+          <figure class="polaroid polaroid--2">
+            <div class="polaroid__img">
+              <img src="img/tapthe-2.jpg" width="1600" height="1200" alt="Thêm một tấm ảnh tập thể cả nhà LightHuman, hàng trước quỳ gối cùng gấu bông Pikachu" decoding="async" />
+            </div>
+            <figcaption class="polaroid__caption">Chúc mừng 20/10</figcaption>
+          </figure>
+        </div>
+        <p class="photo__end">Thương cả nhà, <span class="neon">BD Hệ thống</span></p>
+      </div>
     </div>
   </section>
 
-  <!-- STAGE 2: 3D Pastel Floral Bouquet & Wish Pills -->
-  <main class="scene" id="scene" aria-labelledby="sceneTitle" hidden>
-    <!-- Left Column: 3 Wish Pills -->
-    <div class="wishes-col wishes-col--left">
-      <div class="wish-pill wish--yellow pop" role="button" tabindex="0" aria-label="Lời chúc: Luôn rực rỡ">
-        <span class="wish-pill__icon"><i class="ph-fill ph-sparkle" aria-hidden="true"></i></span>
-        <div class="wish-pill__content">
-          <span class="wish-pill__title">Luôn rực rỡ</span>
-          <span class="wish-pill__desc">Mỗi ngày đều toả sáng theo cách của bạn</span>
-        </div>
-      </div>
+  <!-- ===== Thanh tiến trình câu chuyện ===== -->
+  <nav class="story" aria-label="Các phần của câu chuyện">
+    <span class="story__line" aria-hidden="true"><span class="story__fill"></span></span>
+    <ol class="story__list">
+      <li><a class="story__dot" href="#scene" data-chapter="scene"><span>Bó hoa</span></a></li>
+      <li><a class="story__dot" href="#letter" data-chapter="letter"><span>Lá thư</span></a></li>
+      <li><a class="story__dot" href="#wishesTeam" data-chapter="wishesTeam"><span>Lời chúc</span></a></li>
+      <li><a class="story__dot" href="#photo" data-chapter="photo"><span>Ảnh tập thể</span></a></li>
+    </ol>
+  </nav>
 
-      <div class="wish-pill wish--green pop" role="button" tabindex="0" aria-label="Lời chúc: Tiền đầy đủ">
-        <span class="wish-pill__icon"><i class="ph-fill ph-plant" aria-hidden="true"></i></span>
-        <div class="wish-pill__content">
-          <span class="wish-pill__title">Tiền đầy đủ</span>
-          <span class="wish-pill__desc">Lương đúng hẹn, thưởng bất ngờ, ví luôn <strong class="ticker" id="ticker">dày</strong></span>
-        </div>
-      </div>
+  <!-- Pills nằm ngoài <main> để luôn nổi trên phần lá thư -->
+  <button class="pill pill--left" type="button" id="replay" aria-label="Gói lại hộp quà và mở lại từ đầu">
+    <i class="ph-light ph-arrow-counter-clockwise" aria-hidden="true"></i>
+    <span class="pill__label">Mở lại</span>
+  </button>
 
-      <div class="wish-pill wish--pink pop" role="button" tabindex="0" aria-label="Lời chúc: Dồi dào hạnh phúc">
-        <span class="wish-pill__icon"><i class="ph-fill ph-heart" aria-hidden="true"></i></span>
-        <div class="wish-pill__content">
-          <span class="wish-pill__title">Dồi dào hạnh phúc</span>
-          <span class="wish-pill__desc">Về nhà có người thương, đi làm có người hiểu</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Center Bouquet and Main Titles -->
-    <div class="scene__center">
-      <div class="bouquet-wrapper pop" id="bouquetWrapper" role="button" tabindex="0" aria-label="Bó hoa 20/10, chạm để hoa nở thêm">
-        <div class="bouquet-glow" aria-hidden="true"></div>
-        <img src="bouquet_transparent.png" alt="Bó hoa 20/10" class="bouquet-img" id="bouquetImg" />
-      </div>
-
-      <h2 class="scene__title pop" id="sceneTitle">Chúc mừng <span class="glow">20/10</span></h2>
-      <p class="scene__to pop">Gửi các chị em nhà LightHuman</p>
-
-      <div class="scene__hint pop" id="hintBadge">
-        <i class="ph-fill ph-heart" aria-hidden="true"></i> Chạm vào hoa hoặc màn hình để trồng thêm hoa nhé
-      </div>
-    </div>
-
-    <!-- Right Column: 2 Wish Pills -->
-    <div class="wishes-col wishes-col--right">
-      <div class="wish-pill wish--blue pop" role="button" tabindex="0" aria-label="Lời chúc: Niềm vui đầy người">
-        <span class="wish-pill__icon"><i class="ph-fill ph-smiley" aria-hidden="true"></i></span>
-        <div class="wish-pill__content">
-          <span class="wish-pill__title">Niềm vui đầy người</span>
-          <span class="wish-pill__desc">Cười nhiều tới mức ai cũng xin bí quyết</span>
-        </div>
-      </div>
-
-      <div class="wish-pill wish--purple pop" role="button" tabindex="0" aria-label="Lời chúc: Không đầy KPI">
-        <span class="wish-pill__icon"><i class="ph-fill ph-chart-line-down" aria-hidden="true"></i></span>
-        <div class="wish-pill__content">
-          <span class="wish-pill__title">Không đầy <s class="strike">KPI</s></span>
-          <span class="wish-pill__desc">Deadline nhẹ, task vừa sức, họp ngắn</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Action Pills -->
-    <button class="pill pill--left" type="button" id="replay" aria-label="Gói lại hộp quà và mở lại từ đầu">
-      <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
-      <span class="pill__label">Mở lại</span>
-    </button>
-
-    <button class="pill pill--right music" type="button" id="music" data-state="paused" aria-pressed="false" aria-label="Bật nhạc">
-      <span class="music__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <span class="music__flower" aria-hidden="true">🌷</span>
-      <span class="pill__label" id="musicLabel">Chăm Hoa</span>
-    </button>
-  </main>
+  <button class="pill pill--right music" type="button" id="music" data-state="paused" aria-pressed="false" aria-label="Bật nhạc">
+    <span class="music__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <i class="ph-light ph-flower-tulip music__icon" aria-hidden="true"></i>
+    <span class="pill__label" id="musicLabel">Chăm Hoa</span>
+  </button>
+  </div>
 
   <script src="script.js"></script>
 </body>

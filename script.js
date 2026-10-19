@@ -1,29 +1,70 @@
 (() => {
   "use strict";
 
+  /* =========================================================
+     BD HỆ THỐNG: mỗi người trao một bông hoa, một lời chúc.
+     Sửa tên, lời chúc, dòng ký tên ở đây. Lời chúc hiện là bản nháp.
+     tone: viền thẻ "pink" | "lilac"; flower: "pink" | "gold" | "lilac" | "mint"
+     ========================================================= */
+  const TEAM = [
+    {
+      name: "Minh Hùm",
+      role: "BD Hệ thống",
+      tone: "pink",
+      flower: "pink",
+      meaning: "Rạng rỡ",
+      wish: "Hùm chúc các chị em lúc nào cũng rạng rỡ như bông hoa to nhất trong bó: đi làm tự tin, về nhà nhẹ nhõm, chụp tấm ảnh nào cũng ưng. Việc gì khó cứ để BD Hệ thống gánh, các chị em chỉ việc tỏa sáng thôi.",
+      sign: "Thương, Hùm",
+    },
+    {
+      name: "Hòn Trợn",
+      role: "BD Hệ thống",
+      tone: "lilac",
+      flower: "gold",
+      meaning: "Tươi vui",
+      wish: "Trợn chúc các chị em ngày nào cũng có chuyện để cười: trà sữa đúng vị, task vừa sức, họp xong sớm hơn dự kiến. Mong tiếng cười của mọi người cứ rộn ràng khắp văn phòng như hôm nay, để cả team đi làm cũng vui lây.",
+      sign: "Thương, Trợn",
+    },
+    {
+      name: "Tuấn Kẹc",
+      role: "BD Hệ thống",
+      tone: "pink",
+      flower: "lilac",
+      meaning: "Bình an",
+      wish: "Kẹc chúc các chị em thật khỏe và thật bình an: ngủ đủ giấc, ăn đúng bữa, không phải thức khuya vì deadline. Dù công việc có lúc bận rộn, mong ai cũng giữ được những phút thảnh thơi cho riêng mình.",
+      sign: "Thương, Kẹc",
+    },
+    {
+      name: "Lê Bống",
+      role: "BD Hệ thống",
+      tone: "lilac",
+      flower: "mint",
+      meaning: "Hạnh phúc",
+      wish: "Bống chúc các chị em thật nhiều hạnh phúc, ở nhà có người thương, ở công ty có đồng đội hiểu mình. Cảm ơn mọi người đã luôn dịu dàng và kiên nhẫn với BD Hệ thống. 20/10 vui hết mình nhé, và những ngày còn lại cũng vậy.",
+      sign: "Thương, Bống",
+    },
+  ];
+
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const wait = (ms) => new Promise((r) => setTimeout(r, reduceMotion.matches ? 0 : ms));
 
-  // Diverse Pastel Colors matching the mockup:
-  const YELLOW = [253, 224, 71];    // Vàng pastel tươi
-  const BLUE = [125, 211, 252];      // Xanh dương pastel
-  const GREEN = [134, 239, 172];     // Xanh lá pastel / mint
-  const PINK = [244, 114, 182];      // Hồng phấn
-  const LILAC = [196, 181, 253];     // Tím lavender
-  const PEACH = [251, 146, 60];      // Cam đào
-  const GOLD = [245, 158, 11];       // Nhụy vàng hổ phách
-
-  const PASTEL_PALETTE = [BLUE, YELLOW, GREEN, PINK, LILAC, PEACH];
-
+  // Neon palette, mirrors the tokens in styles.css
+  const PINK = [255, 122, 184];
+  const LILAC = [169, 155, 255];
+  const MINT = [125, 255, 208];
+  const GOLD = [255, 217, 138];
+  const NEON = [PINK, LILAC, GOLD, PINK, MINT];
   const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
   const order = document.getElementById("order");
   const gift = document.getElementById("gift");
   const openBtn = document.getElementById("openGift");
+  const openLabel = document.getElementById("openLabel");
+  const stage2 = document.getElementById("stage2");
   const scene = document.getElementById("scene");
   const replayBtn = document.getElementById("replay");
-  const bouquetWrapper = document.getElementById("bouquetWrapper");
-  const bouquetImg = document.getElementById("bouquetImg");
+  const bouquet = document.getElementById("bouquet");
 
   /* =========================================================
      MUSIC (Chăm Hoa mp3)
@@ -79,233 +120,379 @@
   ["pointerdown", "keydown"].forEach((ev) => window.addEventListener(ev, kick, { once: true }));
 
   /* =========================================================
-     PETALS + SPARKS + CLICK-TO-PLANT BLOSSOMS
+     CANVAS FX: stars, neon grass, petals, planted blossoms, sparks
      ========================================================= */
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const pCanvas = document.getElementById("petals");
-  const pCtx = pCanvas.getContext("2d");
-  let pW = 0, pH = 0;
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  const cv = document.getElementById("fx");
+  const ctx = cv.getContext("2d");
+  let W = 0, H = 0;
+  const stars = [];
+  const blades = [];
   const petals = [];
+  const blossoms = [];
   const sparks = [];
-  const plantedFlowers = [];
+  const meteors = [];
 
-  const sizePetals = () => {
-    pW = window.innerWidth;
-    pH = window.innerHeight;
-    pCanvas.width = pW * dpr;
-    pCanvas.height = pH * dpr;
-    pCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const resize = () => {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    cv.width = W * dpr;
+    cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    stars.length = 0;
+    const nStars = Math.min(220, Math.round((W * H) / 6500));
+    for (let i = 0; i < nStars; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: 0.4 + Math.random() * 1.4,
+        t: Math.random() * 6.28,
+        s: 0.6 + Math.random() * 1.6,
+        col: Math.random() < 0.2 ? PINK : Math.random() < 0.4 ? LILAC : [255, 244, 250],
+      });
+    }
+
+    blades.length = 0;
+    const nBlades = Math.round(W / 6);
+    for (let i = 0; i < nBlades; i++) {
+      blades.push({
+        x: (i / nBlades) * W + Math.random() * 4,
+        h: (0.03 + Math.random() * 0.07) * H * (0.5 + 0.9 * Math.pow(Math.sin((i / nBlades) * 9 + 1), 2)),
+        ph: Math.random() * 6.28,
+        w: 1 + Math.random() * 1.1,
+        col: pick([MINT, MINT, [110, 220, 255], PINK, LILAC]),
+      });
+    }
+    if (reduceMotion.matches) drawStatic();
   };
 
-  const makePetal = (top) => {
-    const isLeaf = Math.random() < 0.22;
-    const col = isLeaf ? GREEN : PASTEL_PALETTE[Math.floor(Math.random() * PASTEL_PALETTE.length)];
-    return {
-      x: Math.random() * pW,
-      y: top ? -20 - Math.random() * pH * 0.3 : Math.random() * pH,
-      r: 6 + Math.random() * 8,
-      vy: 0.4 + Math.random() * 0.75,
-      vx: -0.25 + Math.random() * 0.5,
-      rot: Math.random() * Math.PI * 2,
-      vr: -0.02 + Math.random() * 0.04,
-      sway: Math.random() * Math.PI * 2,
-      col,
-      isLeaf,
-      alpha: 0.45 + Math.random() * 0.35,
-    };
-  };
-
-  const petalPath = (ctx, r) => {
+  const petalPath = (r) => {
     ctx.beginPath();
     ctx.moveTo(0, -r);
     ctx.bezierCurveTo(r * 0.9, -r * 0.6, r * 0.7, r * 0.7, 0, r);
     ctx.bezierCurveTo(-r * 0.7, r * 0.7, -r * 0.9, -r * 0.6, 0, -r);
-    ctx.fill();
   };
 
-  const leafPath = (ctx, r) => {
+  const makePetal = (top) => ({
+    x: Math.random() * W,
+    y: top ? -20 : Math.random() * H,
+    r: 5 + Math.random() * 6,
+    vy: 22 + Math.random() * 30,
+    vx: -6 + Math.random() * 12,
+    rot: Math.random() * 6.28,
+    vr: (Math.random() - 0.5) * 1.6,
+    ph: Math.random() * 6.28,
+    col: pick([PINK, LILAC, GOLD]),
+  });
+
+  const drawStars = (dt) => {
+    for (const s of stars) {
+      s.t += dt * s.s;
+      ctx.globalAlpha = 0.3 + 0.5 * Math.abs(Math.sin(s.t));
+      ctx.fillStyle = rgba(s.col, 1);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, 6.283);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  };
+
+  const drawGrass = (tm) => {
+    ctx.globalCompositeOperation = "lighter";
+    ctx.lineCap = "round";
+    for (const b of blades) {
+      const sw = Math.sin(tm * 1.2 + b.ph + b.x * 0.004) * (4 + b.h * 0.12);
+      ctx.strokeStyle = rgba(b.col, 0.55);
+      ctx.lineWidth = b.w;
+      ctx.beginPath();
+      ctx.moveTo(b.x, H);
+      ctx.quadraticCurveTo(b.x + sw * 0.3, H - b.h * 0.6, b.x + sw, H - b.h);
+      ctx.stroke();
+    }
+    ctx.globalCompositeOperation = "source-over";
+  };
+
+  // Outlined neon flower, same 6-petal shape as the SVG bouquet
+  const drawFlower = (f) => {
+    ctx.save();
+    ctx.translate(f.x, f.y);
+    ctx.rotate(f.rot);
+    ctx.scale(f.scale, f.scale);
+    ctx.globalAlpha = Math.min(1, f.life * 1.6);
+    ctx.lineWidth = 1.6 / Math.max(f.scale, 0.3);
+    ctx.strokeStyle = rgba(f.col, 1);
+    ctx.fillStyle = rgba(f.col, 0.1);
+    ctx.shadowColor = rgba(f.col, 0.9);
+    ctx.shadowBlur = 12;
+    for (let p = 0; p < 6; p++) {
+      ctx.save();
+      ctx.rotate((p / 6) * Math.PI * 2);
+      ctx.beginPath();
+      ctx.ellipse(0, -f.size * 0.5, f.size * 0.22, f.size * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
     ctx.beginPath();
-    ctx.moveTo(0, -r * 1.15);
-    ctx.quadraticCurveTo(r * 0.6, -r * 0.1, 0, r * 1.15);
-    ctx.quadraticCurveTo(-r * 0.6, -r * 0.1, 0, -r * 1.15);
-    ctx.fill();
+    ctx.arc(0, 0, f.size * 0.16, 0, Math.PI * 2);
+    ctx.strokeStyle = rgba(GOLD, 1);
+    ctx.shadowColor = rgba(GOLD, 0.9);
+    ctx.stroke();
+    ctx.restore();
   };
 
-  let pRaf = 0;
-  const petalLoop = () => {
-    pCtx.clearRect(0, 0, pW, pH);
+  let raf = 0;
+  let last = performance.now();
+  let meteorAcc = 0;
 
-    // 1. Falling petals and leaves
+  const frame = (now) => {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    ctx.clearRect(0, 0, W, H);
+
+    drawStars(dt);
+    drawGrass(now / 1000);
+
+    // Meteors, rare
+    meteorAcc += dt * 0.18;
+    if (meteorAcc >= 1) {
+      meteorAcc = 0;
+      meteors.push({ x: W * (0.3 + Math.random() * 0.7), y: Math.random() * H * 0.35, vx: -(380 + Math.random() * 220), vy: 150 + Math.random() * 100, life: 1 });
+    }
+    for (let i = meteors.length - 1; i >= 0; i--) {
+      const m = meteors[i];
+      m.x += m.vx * dt; m.y += m.vy * dt; m.life -= dt * 1.1;
+      if (m.life <= 0) { meteors.splice(i, 1); continue; }
+      const g = ctx.createLinearGradient(m.x, m.y, m.x - m.vx * 0.16, m.y - m.vy * 0.16);
+      g.addColorStop(0, `rgba(255,255,255,${m.life})`);
+      g.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(m.x - m.vx * 0.16, m.y - m.vy * 0.16);
+      ctx.stroke();
+    }
+
+    // Falling neon petals (outlined)
+    ctx.lineWidth = 1.3;
     for (const p of petals) {
-      p.sway += 0.012;
-      p.x += p.vx + Math.sin(p.sway) * 0.45;
-      p.y += p.vy;
-      p.rot += p.vr;
-      if (p.y > pH + 20) Object.assign(p, makePetal(true));
-
-      pCtx.save();
-      pCtx.translate(p.x, p.y);
-      pCtx.rotate(p.rot);
-      pCtx.fillStyle = rgba(p.col, p.alpha);
-      if (p.isLeaf) leafPath(pCtx, p.r);
-      else petalPath(pCtx, p.r);
-      pCtx.restore();
+      p.ph += dt * 2;
+      p.x += (p.vx + Math.sin(p.ph) * 18) * dt;
+      p.y += p.vy * dt;
+      p.rot += p.vr * dt;
+      if (p.y > H + 20) Object.assign(p, makePetal(true));
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.scale(Math.abs(Math.cos(p.ph)) * 0.6 + 0.4, 1);
+      petalPath(p.r);
+      ctx.fillStyle = rgba(p.col, 0.12);
+      ctx.strokeStyle = rgba(p.col, 0.85);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
     }
 
-    // 2. Interactive planted blossoms (spawned by user taps anywhere!)
-    for (let i = plantedFlowers.length - 1; i >= 0; i--) {
-      const f = plantedFlowers[i];
-      f.scale += (f.targetScale - f.scale) * 0.14;
-      f.rot += f.vr;
-      f.y += f.vy;
-      f.life -= f.decay;
-      if (f.life <= 0) { plantedFlowers.splice(i, 1); continue; }
-
-      pCtx.save();
-      pCtx.translate(f.x, f.y);
-      pCtx.rotate(f.rot);
-      pCtx.scale(f.scale, f.scale);
-      pCtx.globalAlpha = Math.min(1, f.life * 1.6);
-
-      const nPetals = f.type === "daisy" ? 8 : 5;
-      const petLen = f.size * 0.62;
-      const petWid = petLen * 0.52;
-      pCtx.fillStyle = rgba(f.col, 0.92);
-
-      for (let p = 0; p < nPetals; p++) {
-        pCtx.save();
-        pCtx.rotate((p / nPetals) * Math.PI * 2);
-        pCtx.beginPath();
-        pCtx.moveTo(0, 0);
-        pCtx.bezierCurveTo(petWid, -petLen * 0.4, petWid * 0.6, -petLen, 0, -petLen);
-        pCtx.bezierCurveTo(-petWid * 0.6, -petLen, -petWid, -petLen * 0.4, 0, 0);
-        pCtx.fill();
-        pCtx.restore();
-      }
-
-      // Warm Amber pollen center
-      pCtx.beginPath();
-      pCtx.arc(0, 0, f.size * 0.24, 0, Math.PI * 2);
-      pCtx.fillStyle = rgba(GOLD, 0.95);
-      pCtx.fill();
-
-      pCtx.restore();
+    // Planted blossoms
+    for (let i = blossoms.length - 1; i >= 0; i--) {
+      const f = blossoms[i];
+      f.scale += (1 - f.scale) * Math.min(1, dt * 7);
+      f.rot += f.vr * dt;
+      f.y += f.vy * dt;
+      f.life -= dt * 0.22;
+      if (f.life <= 0) { blossoms.splice(i, 1); continue; }
+      drawFlower(f);
     }
 
-    // 3. Sparks & Confetti
+    // Sparks
+    ctx.globalCompositeOperation = "lighter";
     for (let i = sparks.length - 1; i >= 0; i--) {
       const s = sparks[i];
-      s.vy += 0.12; s.vx *= 0.985;
-      s.x += s.vx; s.y += s.vy; s.rot += s.vr; s.life -= 0.011;
+      s.vy += 90 * dt; s.vx *= 0.985;
+      s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt * 0.8;
       if (s.life <= 0) { sparks.splice(i, 1); continue; }
-
-      pCtx.save();
-      pCtx.translate(s.x, s.y);
-      pCtx.rotate(s.rot);
-      pCtx.fillStyle = rgba(s.col, s.life);
-      petalPath(pCtx, s.r);
-      pCtx.restore();
+      ctx.globalAlpha = s.life;
+      ctx.fillStyle = rgba(s.col, 1);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 2.2, 0, 6.283);
+      ctx.fill();
     }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
 
-    pRaf = requestAnimationFrame(petalLoop);
+    raf = requestAnimationFrame(frame);
   };
 
-  const petalStart = () => {
-    if (!pRaf && !document.hidden && !reduceMotion.matches) {
-      pRaf = requestAnimationFrame(petalLoop);
+  // Reduced motion: one still frame of stars + grass, no loop
+  function drawStatic() {
+    ctx.clearRect(0, 0, W, H);
+    drawStars(0);
+    drawGrass(0);
+  }
+
+  const start = () => {
+    if (!raf && !document.hidden && !reduceMotion.matches) {
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
     }
   };
-  const petalStop = () => {
-    cancelAnimationFrame(pRaf);
-    pRaf = 0;
-  };
+  const stop = () => { cancelAnimationFrame(raf); raf = 0; };
 
-  const burst = (x, y, count = 40, power = 5) => {
+  const burst = (x, y, count = 40, power = 220) => {
     if (reduceMotion.matches) return;
     for (let i = 0; i < count; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const sp = 2 + Math.random() * power;
-      const col = PASTEL_PALETTE[Math.floor(Math.random() * PASTEL_PALETTE.length)];
-      sparks.push({
-        x, y,
-        vx: Math.cos(a) * sp,
-        vy: Math.sin(a) * sp - 3,
-        r: 4 + Math.random() * 7,
-        rot: Math.random() * 6,
-        vr: -0.2 + Math.random() * 0.4,
-        life: 1,
-        col,
-      });
+      const a = (i / count) * 6.283 + Math.random() * 0.2;
+      const v = power * (0.4 + Math.random() * 0.6);
+      sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, col: pick(NEON) });
     }
-    petalStart();
   };
 
   const plantFlower = (x, y) => {
     if (reduceMotion.matches) return;
-    const types = ["daisy", "blossom", "rose", "mint"];
-    const type = types[Math.floor(Math.random() * types.length)];
-    const col = PASTEL_PALETTE[Math.floor(Math.random() * PASTEL_PALETTE.length)];
-    plantedFlowers.push({
+    blossoms.push({
       x, y,
-      type,
-      col,
-      size: 18 + Math.random() * 14,
+      col: pick([PINK, LILAC, GOLD]),
+      size: 22 + Math.random() * 16,
       scale: 0,
-      targetScale: 1,
-      rot: Math.random() * Math.PI * 2,
-      vr: (Math.random() - 0.5) * 0.015,
-      vy: -0.22 - Math.random() * 0.35,
+      rot: Math.random() * 6.28,
+      vr: (Math.random() - 0.5) * 0.8,
+      vy: -10 - Math.random() * 18,
       life: 1,
-      decay: 0.003,
     });
-    burst(x, y, 14, 3);
+    burst(x, y, 14, 120);
   };
-
-  // Interactive: Click anywhere on screen to plant/bloom flowers!
-  window.addEventListener("click", (e) => {
-    if (e.target.closest && (e.target.closest("button") || e.target.closest(".wish-pill") || e.target.closest("#bouquetWrapper"))) return;
-    plantFlower(e.clientX, e.clientY);
-  });
 
   const centerOf = (el) => {
     const r = el.getBoundingClientRect();
     return [r.left + r.width / 2, r.top + r.height / 2];
   };
 
-  // Bouquet click interaction (bounce & bursts)
-  if (bouquetWrapper) {
-    bouquetWrapper.addEventListener("click", () => {
-      const [bx, by] = centerOf(bouquetWrapper);
-      burst(bx, by, 50, 6.5);
-      if (bouquetImg) {
-        bouquetImg.animate([
-          { transform: "scale(1)" },
-          { transform: "scale(1.15) rotate(3deg)" },
-          { transform: "scale(0.95) rotate(-2deg)" },
-          { transform: "scale(1)" }
-        ], { duration: 550, easing: "cubic-bezier(0.16,1,0.3,1)" });
-      }
-    });
-  }
+  // Tap empty space on the scene to plant a blossom
+  window.addEventListener("click", (e) => {
+    if (stage2.hidden) return;
+    if (e.target.closest && e.target.closest("button, a")) return;
+    plantFlower(e.clientX, e.clientY);
+  });
 
-  /* ---------- Money Ticker on Card 2 ---------- */
-  const tickerWords = ["dày", "rủng rỉnh", "dư dả", "ting ting"];
-  const ticker = document.getElementById("ticker");
-  if (!reduceMotion.matches && ticker) {
-    let t = 0;
-    setInterval(() => {
-      if (scene.hidden) return;
-      t = (t + 1) % tickerWords.length;
-      ticker.textContent = tickerWords[t];
-      ticker.animate([
-        { opacity: 0, transform: "translateY(5px)" },
-        { opacity: 1, transform: "none" }
-      ], { duration: 600, easing: "cubic-bezier(0.16,1,0.3,1)" });
-    }, 2200);
-  }
+  bouquet.addEventListener("click", () => {
+    const [bx, by] = centerOf(bouquet);
+    burst(bx, by, 50, 260);
+    for (let i = 0; i < 3; i++) plantFlower(bx + (Math.random() - 0.5) * 220, by + (Math.random() - 0.5) * 160);
+  });
 
   /* =========================================================
-     FLOW: 3D Gift Box -> Open -> Pastel Floral Bouquet
+     STORY: letter, stacked notes, group photo, progress rail
+     ========================================================= */
+  const letter = document.getElementById("letter");
+  const notesEl = document.getElementById("notes");
+  const paperTeam = document.getElementById("paperTeam");
+  const photo = document.getElementById("photo");
+  const polaroids = photo.querySelector(".polaroids");
+  const story = document.querySelector(".story");
+  const storyDots = [...story.querySelectorAll(".story__dot")];
+  const scrollDriven = CSS.supports("animation-timeline: view()");
+
+  const initials = (name) => {
+    const parts = name.trim().split(/\s+/);
+    const two = parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : parts[0].slice(0, 2);
+    return two.toUpperCase();
+  };
+
+  TEAM.forEach((m, i) => {
+    const note = document.createElement("article");
+    note.className = `note note--${m.tone === "lilac" ? "lilac" : "pink"}`;
+    note.dataset.flower = m.flower;
+    note.style.setProperty("--i", i);
+    note.innerHTML = `
+      <header class="note__head">
+        <span class="note__avatar" aria-hidden="true"></span>
+        <div><h3 class="note__name"></h3><p class="note__role"></p></div>
+      </header>
+      <p class="note__gift">
+        <svg class="note__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg>
+        <span>trao bông</span> <strong></strong>
+      </p>
+      <p class="note__wish"></p>
+      <p class="note__sign"><i class="ph-light ph-heart" aria-hidden="true"></i><span></span></p>`;
+    note.querySelector(".note__avatar").textContent = initials(m.name);
+    note.querySelector(".note__name").textContent = m.name;
+    note.querySelector(".note__role").textContent = m.role;
+    note.querySelector(".note__gift strong").textContent = m.meaning;
+    note.querySelector(".note__wish").textContent = m.wish;
+    note.querySelector(".note__sign span").textContent = m.sign;
+    notesEl.append(note);
+
+    const chip = document.createElement("span");
+    chip.textContent = initials(m.name);
+    paperTeam.append(chip);
+  });
+
+  const passed = (en) => en.isIntersecting || en.boundingClientRect.top < 0;
+  const midline = { rootMargin: "0px 0px -50% 0px" };
+
+  // Envelope steps: classes drive the fallback; a spark burst marks the tear everywhere
+  let tornOnce = false;
+  const stepIO = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      const step = en.target.dataset.step;
+      const on = passed(en);
+      if (!scrollDriven) letter.classList.toggle(`is-${step}`, on);
+      if (step !== "torn") return;
+      if (on && !tornOnce && !stage2.hidden) {
+        tornOnce = true;
+        const env = letter.querySelector(".envelope").getBoundingClientRect();
+        burst(env.left + env.width / 2, env.top + env.height * 0.2, 44, 240);
+      }
+      if (!on) tornOnce = false;
+    });
+  }, midline);
+  letter.querySelectorAll(".letter__mark").forEach((m) => stepIO.observe(m));
+
+  // Photo finale: develop (fallback) + celebration
+  let cheered = false;
+  const photoIO = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      const on = passed(en);
+      if (!scrollDriven) photo.classList.toggle("is-in", on);
+      if (on && !cheered && !stage2.hidden) {
+        cheered = true;
+        const r = polaroids.getBoundingClientRect();
+        burst(r.left + r.width * 0.2, r.top + r.height * 0.3, 50, 300);
+        burst(r.right - r.width * 0.2, r.top + r.height * 0.3, 50, 300);
+        for (let k = 0; k < 6; k++) plantFlower(r.left + Math.random() * r.width, r.top + Math.random() * r.height);
+      }
+      if (!on) cheered = false;
+    });
+  }, midline);
+  photoIO.observe(photo.querySelector(".photo__mark"));
+
+  if (!scrollDriven) {
+    const noteIO = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("is-visible"); noteIO.unobserve(en.target); } });
+    }, { threshold: 0.2 });
+    notesEl.querySelectorAll(".note").forEach((n) => noteIO.observe(n));
+  }
+
+  // Story rail: highlight the chapter crossing the middle of the screen
+  const chapters = storyDots.map((d) => document.getElementById(d.dataset.chapter));
+  const chapterIO = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      const idx = chapters.indexOf(en.target);
+      storyDots.forEach((d, k) => {
+        d.classList.toggle("is-active", k === idx);
+        if (k === idx) d.setAttribute("aria-current", "step");
+        else d.removeAttribute("aria-current");
+      });
+      story.style.setProperty("--story", String(idx / (chapters.length - 1)));
+    });
+  }, { rootMargin: "-50% 0px -50% 0px" });
+  chapters.forEach((c) => chapterIO.observe(c));
+
+  /* =========================================================
+     FLOW: gift -> open -> bouquet & story
      ========================================================= */
   scene.querySelectorAll(".pop").forEach((el, i) => el.style.setProperty("--i", i + 1));
 
@@ -314,36 +501,43 @@
     if (busy) return;
     busy = true;
     openBtn.disabled = true;
+    openBtn.setAttribute("aria-busy", "true");
+    openLabel.textContent = "Đang mở...";
     playMusic();
 
     gift.classList.add("is-open");
     const [gx, gy] = centerOf(gift);
-    burst(gx, gy, 90, 8);
-    await wait(450);
+    burst(gx, gy, 90, 320);
+    await wait(500);
 
     order.classList.add("is-leaving");
-    await wait(600);
+    await wait(700);
     order.hidden = true;
 
-    scene.hidden = false;
-    void scene.offsetWidth; // force reflow for smooth animation
+    stage2.hidden = false;
+    void scene.offsetWidth;
     scene.classList.add("is-in");
+    window.scrollTo({ top: 0, behavior: "instant" });
 
-    if (bouquetWrapper) {
-      const [bx, by] = centerOf(bouquetWrapper);
-      burst(bx, by, 70, 7);
-    }
+    await wait(500);
+    const [bx, by] = centerOf(bouquet);
+    burst(bx, by, 60, 280);
     busy = false;
   };
 
   const replay = () => {
     scene.classList.remove("is-in");
-    scene.hidden = true;
+    stage2.hidden = true;
+    letter.classList.remove("is-torn", "is-out");
+    photo.classList.remove("is-in");
+    window.scrollTo({ top: 0, behavior: "instant" });
     gift.classList.remove("is-open");
     order.hidden = false;
     void order.offsetWidth;
     order.classList.remove("is-leaving");
     openBtn.disabled = false;
+    openBtn.removeAttribute("aria-busy");
+    openLabel.textContent = "Mở hộp quà";
     openBtn.focus();
   };
 
@@ -352,17 +546,13 @@
   replayBtn.addEventListener("click", replay);
 
   /* ---------- Lifecycle ---------- */
-  window.addEventListener("resize", sizePetals);
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) petalStop();
-    else petalStart();
-  });
+  window.addEventListener("resize", resize);
+  document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+  reduceMotion.addEventListener("change", () => (reduceMotion.matches ? (stop(), drawStatic()) : start()));
 
-  sizePetals();
-  if (!reduceMotion.matches) {
-    const count = pW < 640 ? 14 : 26;
-    for (let i = 0; i < count; i++) petals.push(makePetal(false));
-    petalStart();
-  }
+  resize();
+  const count = W < 640 ? 12 : 22;
+  for (let i = 0; i < count; i++) petals.push(makePetal(false));
+  start();
   setTimeout(() => openBtn.focus({ preventScroll: true }), 50);
 })();
