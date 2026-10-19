@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>20/10 nhà LightHuman</title>
+  <meta name="description" content="Một hộp quà 20/10 từ BD Hệ thống gửi các chị em nhà LightHuman: luôn rực rỡ, tiền đầy đủ, niềm vui đầy người, không đầy KPI, dồi dào hạnh phúc." />
+  <meta name="theme-color" content="#faf9f6" />
+  <link rel="preload" href="Chamhoa.mp3" as="audio" type="audio/mpeg" />
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="petals" class="petals" aria-hidden="true"></canvas>
+
+  <audio id="song" src="Chamhoa.mp3" loop preload="auto"></audio>
+
+  <!-- STAGE 1: gift box -->
+  <section class="order" id="order" aria-labelledby="orderTitle">
+    <div class="order__card">
+      <header class="order__header">
+        <h1 class="order__title" id="orderTitle">Hộp quà 20/10</h1>
+        <p class="order__kicker">Gửi các chị em nhà LightHuman</p>
+      </header>
+
+      <button class="gift" type="button" id="gift" aria-label="Mở hộp quà">
+        <span class="gift__shadow" aria-hidden="true"></span>
+        <span class="gift__light" aria-hidden="true"></span>
+        <span class="g-scene" aria-hidden="true">
+          <span class="g-base">
+            <span class="face f-front"></span>
+            <span class="face f-back"></span>
+            <span class="face f-right"></span>
+            <span class="face f-left"></span>
+            <span class="face f-bottom"></span>
+            <span class="face f-inside"></span>
+          </span>
+          <span class="g-lid">
+            <span class="face l-top"></span>
+            <span class="face l-front"></span>
+            <span class="face l-back"></span>
+            <span class="face l-right"></span>
+            <span class="face l-left"></span>
+            <span class="g-bow">
+              <span class="bow-plane"></span>
+              <span class="bow-plane bow-plane--b"></span>
+              <span class="bow-knot"></span>
+            </span>
+          </span>
+        </span>
+      </button>
+
+      <button class="btn btn--block" type="button" id="openGift">
+        <i class="ph ph-gift" aria-hidden="true"></i>Mở hộp quà
+      </button>
+      <p class="order__note"><i class="ph ph-speaker-high" aria-hidden="true"></i>Bật loa lên để nghe nhạc nhé</p>
+    </div>
+  </section>
+
+  <!-- STAGE 2: flower + wishes, all on one screen -->
+  <main class="scene" id="scene" aria-labelledby="sceneTitle" hidden>
+    <div class="scene__center">
+      <canvas id="bloom" class="bloom" tabindex="0" role="img"
+        aria-label="Bó hoa pastel đa sắc màu đang nở. Nhấn Enter hoặc chạm để hoa nở bông mới."></canvas>
+      <h2 class="scene__title pop" id="sceneTitle">Chúc mừng <span class="glow">20/10</span></h2>
+      <p class="scene__to pop">Gửi các chị em nhà LightHuman</p>
+      <p class="scene__hint pop"><i class="ph ph-sparkle"></i> Chạm vào hoa hoặc màn hình để trồng thêm hoa nhé</p>
+    </div>
+
+    <ul class="wishes" aria-label="Năm lời chúc">
+      <li class="wish wish--1 pop">
+        <i class="ph ph-sparkle wish__icon" aria-hidden="true"></i>
+        <div><h3 class="wish__title">Luôn rực rỡ</h3><p class="wish__text">Mỗi ngày đều toả sáng theo cách của bạn.</p></div>
+      </li>
+      <li class="wish wish--2 pop">
+        <i class="ph ph-coins wish__icon" aria-hidden="true"></i>
+        <div><h3 class="wish__title">Tiền đầy đủ</h3><p class="wish__text">Lương đúng hẹn, thưởng bất ngờ, ví luôn <span class="ticker" id="ticker">dày</span>.</p></div>
+      </li>
+      <li class="wish wish--3 pop">
+        <i class="ph ph-smiley-wink wish__icon" aria-hidden="true"></i>
+        <div><h3 class="wish__title">Niềm vui đầy người</h3><p class="wish__text">Cười nhiều tới mức ai cũng xin bí quyết.</p></div>
+      </li>
+      <li class="wish wish--4 wish--lilac pop">
+        <i class="ph ph-chart-line-down wish__icon" aria-hidden="true"></i>
+        <div><h3 class="wish__title">Không đầy <s class="strike">KPI</s></h3><p class="wish__text">Deadline nhẹ, task vừa sức, họp ngắn.</p></div>
+      </li>
+      <li class="wish wish--5 pop">
+        <i class="ph ph-heart wish__icon wish__icon--beat" aria-hidden="true"></i>
+        <div><h3 class="wish__title">Dồi dào hạnh phúc</h3><p class="wish__text">Về nhà có người thương, đi làm có người hiểu.</p></div>
+      </li>
+    </ul>
+
+    <button class="pill pill--left" type="button" id="replay" aria-label="Gói lại hộp quà và mở lại từ đầu">
+      <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i><span class="pill__label">Mở lại</span>
+    </button>
+  </main>
+
+  <button class="pill pill--right music" type="button" id="music" data-state="paused" aria-pressed="false" aria-label="Bật nhạc">
+    <span class="music__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <i class="ph ph-play music__play" aria-hidden="true"></i>
+    <span class="pill__label" id="musicLabel">Bật nhạc</span>
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>
