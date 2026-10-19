@@ -4,29 +4,29 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const wait = (ms) => new Promise((r) => setTimeout(r, reduceMotion.matches ? 0 : ms));
 
-  // Diverse pastel palette: Xanh dương, Vàng, Xanh lá mint/sage, Hồng phấn, Tím lavender, Cam đào
-  const YELLOW = [253, 224, 71];    // Vàng pastel nắng tươi
+  // Diverse Pastel Colors matching the mockup:
+  const YELLOW = [253, 224, 71];    // Vàng pastel tươi
   const BLUE = [125, 211, 252];      // Xanh dương pastel
   const GREEN = [134, 239, 172];     // Xanh lá pastel / mint
   const PINK = [244, 114, 182];      // Hồng phấn
   const LILAC = [196, 181, 253];     // Tím lavender
   const PEACH = [251, 146, 60];      // Cam đào
   const GOLD = [245, 158, 11];       // Nhụy vàng hổ phách
-  const WHITE = [255, 255, 255];
 
   const PASTEL_PALETTE = [BLUE, YELLOW, GREEN, PINK, LILAC, PEACH];
 
   const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
-  const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
 
   const order = document.getElementById("order");
   const gift = document.getElementById("gift");
   const openBtn = document.getElementById("openGift");
   const scene = document.getElementById("scene");
   const replayBtn = document.getElementById("replay");
+  const bouquetWrapper = document.getElementById("bouquetWrapper");
+  const bouquetImg = document.getElementById("bouquetImg");
 
   /* =========================================================
-     MUSIC (local mp3)
+     MUSIC (Chăm Hoa mp3)
      ========================================================= */
   const song = document.getElementById("song");
   const musicBtn = document.getElementById("music");
@@ -35,12 +35,12 @@
 
   const setMusic = (state) => {
     const labels = {
-      loading: ["Đang tải nhạc", "Đang tải nhạc"],
+      loading: ["Đang tải...", "Đang tải nhạc"],
       playing: ["Chăm Hoa", "Tạm dừng nhạc"],
-      paused: ["Bật nhạc", "Bật nhạc"],
+      paused: ["Chăm Hoa", "Bật nhạc"],
       error: ["Lỗi nhạc", "Không tải được file nhạc"],
     };
-    const [text, aria] = labels[state];
+    const [text, aria] = labels[state] || labels.paused;
     musicBtn.dataset.state = state;
     musicLabel.textContent = text;
     musicBtn.setAttribute("aria-label", aria);
@@ -62,8 +62,13 @@
 
   musicBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    if (musicBtn.dataset.state === "playing") { userPaused = true; song.pause(); }
-    else { userPaused = false; playMusic(); }
+    if (musicBtn.dataset.state === "playing") {
+      userPaused = true;
+      song.pause();
+    } else {
+      userPaused = false;
+      playMusic();
+    }
   });
 
   playMusic();
@@ -74,7 +79,7 @@
   ["pointerdown", "keydown"].forEach((ev) => window.addEventListener(ev, kick, { once: true }));
 
   /* =========================================================
-     PETALS + SPARKS + PLANTED FLOWERS (Background canvas)
+     PETALS + SPARKS + CLICK-TO-PLANT BLOSSOMS
      ========================================================= */
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const pCanvas = document.getElementById("petals");
@@ -85,8 +90,10 @@
   const plantedFlowers = [];
 
   const sizePetals = () => {
-    pW = window.innerWidth; pH = window.innerHeight;
-    pCanvas.width = pW * dpr; pCanvas.height = pH * dpr;
+    pW = window.innerWidth;
+    pH = window.innerHeight;
+    pCanvas.width = pW * dpr;
+    pCanvas.height = pH * dpr;
     pCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
 
@@ -97,7 +104,7 @@
       x: Math.random() * pW,
       y: top ? -20 - Math.random() * pH * 0.3 : Math.random() * pH,
       r: 6 + Math.random() * 8,
-      vy: 0.4 + Math.random() * 0.8,
+      vy: 0.4 + Math.random() * 0.75,
       vx: -0.25 + Math.random() * 0.5,
       rot: Math.random() * Math.PI * 2,
       vr: -0.02 + Math.random() * 0.04,
@@ -118,9 +125,9 @@
 
   const leafPath = (ctx, r) => {
     ctx.beginPath();
-    ctx.moveTo(0, -r * 1.1);
-    ctx.quadraticCurveTo(r * 0.6, -r * 0.1, 0, r * 1.1);
-    ctx.quadraticCurveTo(-r * 0.6, -r * 0.1, 0, -r * 1.1);
+    ctx.moveTo(0, -r * 1.15);
+    ctx.quadraticCurveTo(r * 0.6, -r * 0.1, 0, r * 1.15);
+    ctx.quadraticCurveTo(-r * 0.6, -r * 0.1, 0, -r * 1.15);
     ctx.fill();
   };
 
@@ -145,7 +152,7 @@
       pCtx.restore();
     }
 
-    // 2. Interactive planted blossoms (spawned by user taps)
+    // 2. Interactive planted blossoms (spawned by user taps anywhere!)
     for (let i = plantedFlowers.length - 1; i >= 0; i--) {
       const f = plantedFlowers[i];
       f.scale += (f.targetScale - f.scale) * 0.14;
@@ -203,8 +210,15 @@
     pRaf = requestAnimationFrame(petalLoop);
   };
 
-  const petalStart = () => { if (!pRaf && !document.hidden && !reduceMotion.matches) pRaf = requestAnimationFrame(petalLoop); };
-  const petalStop = () => { cancelAnimationFrame(pRaf); pRaf = 0; };
+  const petalStart = () => {
+    if (!pRaf && !document.hidden && !reduceMotion.matches) {
+      pRaf = requestAnimationFrame(petalLoop);
+    }
+  };
+  const petalStop = () => {
+    cancelAnimationFrame(pRaf);
+    pRaf = 0;
+  };
 
   const burst = (x, y, count = 40, power = 5) => {
     if (reduceMotion.matches) return;
@@ -247,9 +261,9 @@
     burst(x, y, 14, 3);
   };
 
-  // Interactive tap anywhere to plant flowers!
+  // Interactive: Click anywhere on screen to plant/bloom flowers!
   window.addEventListener("click", (e) => {
-    if (e.target.closest && (e.target.closest("button") || e.target.closest(".wish"))) return;
+    if (e.target.closest && (e.target.closest("button") || e.target.closest(".wish-pill") || e.target.closest("#bouquetWrapper"))) return;
     plantFlower(e.clientX, e.clientY);
   });
 
@@ -258,285 +272,42 @@
     return [r.left + r.width / 2, r.top + r.height / 2];
   };
 
-  /* =========================================================
-     BLOOM (Rich Pastel Floral Bouquet)
-     Multi-flower composition:
-     - Stems and eucalyptus leaves in XANH LÁ PASTEL
-     - Forget-me-nots in XANH DƯƠNG PASTEL
-     - Daisies & Buttercups in VÀNG PASTEL
-     - Grand centerpiece layered flower in vibrant pastel harmony
-     ========================================================= */
-  const bCanvas = document.getElementById("bloom");
-  const bCtx = bCanvas.getContext("2d");
-  let bSize = 0, bloomT = 0, seed = 0, time = 0, bRaf = 0;
-  let tiltX = 0, tiltY = 0, tx = 0, ty = 0;
-  const ease = (t) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
-
-  const sizeBloom = () => {
-    bSize = bCanvas.getBoundingClientRect().width;
-    if (!bSize) return;
-    bCanvas.width = bSize * dpr; bCanvas.height = bSize * dpr;
-    bCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  };
-
-  const drawBloom = (still) => {
-    const s = bSize;
-    if (!s) return;
-    bCtx.clearRect(0, 0, s, s);
-
-    const cx = s / 2 + tiltX * s * 0.03;
-    const cy = s * 0.46 + tiltY * s * 0.03;
-    const spin = still ? 0 : time * 0.00015 + tiltX * 0.12;
-    const breathe = still ? 1 : 1 + Math.sin(time * 0.0018) * 0.018;
-    const p = ease(bloomT);
-
-    // 1. Soft Warm Ambient Pastel Halo
-    const halo = bCtx.createRadialGradient(cx, cy, 0, cx, cy, s * 0.48);
-    halo.addColorStop(0, rgba(YELLOW, 0.20 * p));
-    halo.addColorStop(0.35, rgba(BLUE, 0.14 * p));
-    halo.addColorStop(0.7, rgba(GREEN, 0.08 * p));
-    halo.addColorStop(1, "rgba(255, 255, 255, 0)");
-    bCtx.fillStyle = halo;
-    bCtx.fillRect(0, 0, s, s);
-
-    // 2. Lá xanh pastel & cành thảo mộc (XANH LÁ PASTEL)
-    bCtx.strokeStyle = rgba(GREEN, 0.75);
-    bCtx.lineWidth = Math.max(3, s * 0.012);
-    bCtx.lineCap = "round";
-    bCtx.beginPath();
-    bCtx.moveTo(cx, cy + s * 0.08);
-    bCtx.quadraticCurveTo(cx + s * 0.08, cy + s * 0.32, cx - s * 0.02, s * 0.96);
-    bCtx.stroke();
-
-    const leafP = ease(Math.max(0, (bloomT - 0.05) / 0.8));
-    if (leafP > 0) {
-      const leafCount = 6;
-      for (let i = 0; i < leafCount; i++) {
-        const side = i % 2 === 0 ? 1 : -1;
-        const ly = cy + s * 0.14 + (i * 0.1) * s * 0.6;
-        const lx = cx + side * s * 0.03;
-        const lAngle = (side * 0.65) + Math.sin(time * 0.001 + i) * 0.05;
-        const lLen = s * 0.18 * leafP;
-        const lWid = lLen * 0.42;
-
-        bCtx.save();
-        bCtx.translate(lx, ly);
-        bCtx.rotate(lAngle);
-
-        const lg = bCtx.createLinearGradient(0, 0, 0, -lLen);
-        lg.addColorStop(0, rgba(GREEN, 0.85));
-        lg.addColorStop(1, rgba([167, 243, 208], 0.6));
-        bCtx.fillStyle = lg;
-        bCtx.beginPath();
-        bCtx.moveTo(0, 0);
-        bCtx.quadraticCurveTo(lWid, -lLen * 0.45, 0, -lLen);
-        bCtx.quadraticCurveTo(-lWid, -lLen * 0.45, 0, 0);
-        bCtx.fill();
-
-        bCtx.strokeStyle = rgba([240, 253, 244], 0.75);
-        bCtx.lineWidth = 1.5;
-        bCtx.beginPath();
-        bCtx.moveTo(0, 0);
-        bCtx.lineTo(0, -lLen * 0.8);
-        bCtx.stroke();
-
-        bCtx.restore();
+  // Bouquet click interaction (bounce & bursts)
+  if (bouquetWrapper) {
+    bouquetWrapper.addEventListener("click", () => {
+      const [bx, by] = centerOf(bouquetWrapper);
+      burst(bx, by, 50, 6.5);
+      if (bouquetImg) {
+        bouquetImg.animate([
+          { transform: "scale(1)" },
+          { transform: "scale(1.15) rotate(3deg)" },
+          { transform: "scale(0.95) rotate(-2deg)" },
+          { transform: "scale(1)" }
+        ], { duration: 550, easing: "cubic-bezier(0.16,1,0.3,1)" });
       }
-    }
-
-    // 3. Chùm hoa xanh dương pastel (XANH DƯƠNG)
-    const blueP = ease(Math.max(0, (bloomT - 0.12) / 0.78));
-    if (blueP > 0) {
-      const blueClusters = [
-        { x: cx - s * 0.28, y: cy - s * 0.14, rot: -0.4, scale: 0.9 },
-        { x: cx + s * 0.26, y: cy - s * 0.18, rot: 0.35, scale: 0.8 },
-        { x: cx - s * 0.16, y: cy - s * 0.30, rot: -0.2, scale: 0.7 },
-      ];
-      for (const cl of blueClusters) {
-        bCtx.save();
-        bCtx.translate(cl.x, cl.y);
-        bCtx.rotate(cl.rot + spin * 0.4);
-        const bRad = s * 0.065 * blueP * cl.scale * breathe;
-
-        for (let pIdx = 0; pIdx < 5; pIdx++) {
-          bCtx.save();
-          bCtx.rotate((pIdx / 5) * Math.PI * 2);
-          const bg = bCtx.createRadialGradient(0, -bRad * 0.7, 0, 0, -bRad * 0.7, bRad * 0.7);
-          bg.addColorStop(0, rgba(WHITE, 0.95));
-          bg.addColorStop(0.4, rgba(BLUE, 0.9));
-          bg.addColorStop(1, rgba([56, 189, 248], 0.75));
-          bCtx.fillStyle = bg;
-          bCtx.beginPath();
-          bCtx.arc(0, -bRad * 0.7, bRad * 0.52, 0, Math.PI * 2);
-          bCtx.fill();
-          bCtx.restore();
-        }
-
-        bCtx.beginPath();
-        bCtx.arc(0, 0, bRad * 0.25, 0, Math.PI * 2);
-        bCtx.fillStyle = rgba(WHITE, 0.95);
-        bCtx.fill();
-        bCtx.restore();
-      }
-    }
-
-    // 4. Hoa cúc vàng nắng pastel (VÀNG PASTEL)
-    const yellowP = ease(Math.max(0, (bloomT - 0.2) / 0.7));
-    if (yellowP > 0) {
-      const yellowBlossoms = [
-        { x: cx + s * 0.28, y: cy + s * 0.08, rot: 0.5, scale: 0.92 },
-        { x: cx - s * 0.26, y: cy + s * 0.14, rot: -0.55, scale: 0.82 },
-        { x: cx + s * 0.14, y: cy - s * 0.28, rot: 0.25, scale: 0.72 },
-      ];
-      for (const yb of yellowBlossoms) {
-        bCtx.save();
-        bCtx.translate(yb.x, yb.y);
-        bCtx.rotate(yb.rot - spin * 0.35);
-        const yRad = s * 0.082 * yellowP * yb.scale * breathe;
-        const petCount = 8;
-        for (let pIdx = 0; pIdx < petCount; pIdx++) {
-          bCtx.save();
-          bCtx.rotate((pIdx / petCount) * Math.PI * 2);
-          const yg = bCtx.createLinearGradient(0, 0, 0, -yRad);
-          yg.addColorStop(0, rgba(YELLOW, 0.95));
-          yg.addColorStop(1, rgba([254, 240, 138], 0.7));
-          bCtx.fillStyle = yg;
-          bCtx.beginPath();
-          bCtx.ellipse(0, -yRad * 0.55, yRad * 0.25, yRad * 0.55, 0, 0, Math.PI * 2);
-          bCtx.fill();
-          bCtx.restore();
-        }
-
-        bCtx.beginPath();
-        bCtx.arc(0, 0, yRad * 0.32, 0, Math.PI * 2);
-        const coreG = bCtx.createRadialGradient(0, 0, 0, 0, 0, yRad * 0.32);
-        coreG.addColorStop(0, rgba([254, 240, 138], 1));
-        coreG.addColorStop(1, rgba(GOLD, 0.95));
-        bCtx.fillStyle = coreG;
-        bCtx.fill();
-        bCtx.restore();
-      }
-    }
-
-    // 5. Đóa hoa trung tâm đa sắc màu rực rỡ
-    const centerTiers = [
-      // Lớp 1: Cánh hoa xanh dương & lavender (8 cánh)
-      { n: 8, len: 0.38, wid: 0.48, col: BLUE, a: 0.82, delay: 0.05, off: 0 },
-      // Lớp 2: Cánh hoa vàng nắng ấm áp (8 cánh)
-      { n: 8, len: 0.32, wid: 0.52, col: YELLOW, a: 0.88, delay: 0.16, off: Math.PI / 8 },
-      // Lớp 3: Cánh hoa xanh lá mint dịu mát (6 cánh)
-      { n: 6, len: 0.25, wid: 0.58, col: GREEN, a: 0.90, delay: 0.28, off: Math.PI / 6 },
-      // Lớp 4: Cánh hoa hồng phấn ngọt ngào (5 cánh)
-      { n: 5, len: 0.18, wid: 0.65, col: PINK, a: 0.95, delay: 0.40, off: Math.PI / 5 },
-    ];
-
-    for (const L of centerTiers) {
-      const cp = still ? 1 : ease((bloomT - L.delay) / (1 - L.delay));
-      if (cp <= 0) continue;
-      const len = s * L.len * cp * breathe;
-      const wid = len * L.wid;
-      for (let i = 0; i < L.n; i++) {
-        bCtx.save();
-        bCtx.translate(cx, cy);
-        bCtx.rotate(L.off + spin + (i / L.n) * Math.PI * 2);
-        const g = bCtx.createLinearGradient(0, 0, 0, -len);
-        g.addColorStop(0, rgba(L.col, L.a));
-        g.addColorStop(0.7, rgba(mix(L.col, WHITE, 0.35), L.a * 0.9));
-        g.addColorStop(1, rgba(WHITE, L.a * 0.4));
-        bCtx.fillStyle = g;
-        bCtx.shadowColor = rgba(L.col, 0.4);
-        bCtx.shadowBlur = 10;
-        bCtx.beginPath();
-        bCtx.moveTo(0, 0);
-        bCtx.bezierCurveTo(wid, -len * 0.35, wid * 0.7, -len * 0.95, 0, -len);
-        bCtx.bezierCurveTo(-wid * 0.7, -len * 0.95, -wid, -len * 0.35, 0, 0);
-        bCtx.fill();
-        bCtx.restore();
-      }
-    }
-
-    // Nhụy hoa trung tâm với phấn hoa vàng ánh kim
-    const coreP = still ? 1 : ease((bloomT - 0.5) / 0.5);
-    if (coreP > 0) {
-      bCtx.shadowBlur = 0;
-      for (let i = 0; i < 16; i++) {
-        const a = (i / 16) * Math.PI * 2 + spin * 1.8;
-        const rr = s * 0.048 * coreP;
-        bCtx.beginPath();
-        bCtx.arc(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, s * 0.007, 0, Math.PI * 2);
-        bCtx.fillStyle = rgba(YELLOW, 0.95);
-        bCtx.fill();
-      }
-      const centerBall = bCtx.createRadialGradient(cx, cy, 0, cx, cy, s * 0.038 * coreP);
-      centerBall.addColorStop(0, rgba(WHITE, 1));
-      centerBall.addColorStop(0.5, rgba(YELLOW, 0.95));
-      centerBall.addColorStop(1, rgba(GOLD, 0.9));
-      bCtx.beginPath();
-      bCtx.arc(cx, cy, s * 0.035 * coreP, 0, Math.PI * 2);
-      bCtx.fillStyle = centerBall;
-      bCtx.fill();
-    }
-  };
-
-  const bloomLoop = (ts) => {
-    time = ts;
-    if (bloomT < 1) bloomT = Math.min(1, bloomT + 0.008);
-    tiltX += (tx - tiltX) * 0.06;
-    tiltY += (ty - tiltY) * 0.06;
-    drawBloom(false);
-    bRaf = requestAnimationFrame(bloomLoop);
-  };
-
-  const bloomStart = () => {
-    if (reduceMotion.matches) { bloomT = 1; drawBloom(true); return; }
-    if (!bRaf && !document.hidden) bRaf = requestAnimationFrame(bloomLoop);
-  };
-  const bloomStop = () => { cancelAnimationFrame(bRaf); bRaf = 0; };
-
-  const rebloom = (x, y) => {
-    seed++;
-    if (reduceMotion.matches) { drawBloom(true); return; }
-    bloomT = 0;
-    burst(x, y, 60, 6.5);
-  };
-
-  bCanvas.addEventListener("click", (e) => rebloom(e.clientX, e.clientY));
-  bCanvas.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      const [x, y] = centerOf(bCanvas);
-      rebloom(x, y);
-    }
-  });
-
-  bCanvas.addEventListener("pointermove", (e) => {
-    const r = bCanvas.getBoundingClientRect();
-    tx = ((e.clientX - r.left) / r.width - 0.5) * 2;
-    ty = ((e.clientY - r.top) / r.height - 0.5) * 2;
-  });
-  bCanvas.addEventListener("pointerleave", () => { tx = 0; ty = 0; });
-
-  if ("ResizeObserver" in window) {
-    new ResizeObserver(() => { sizeBloom(); if (!bRaf) drawBloom(true); }).observe(bCanvas);
+    });
   }
 
-  /* ---------- money ticker ---------- */
+  /* ---------- Money Ticker on Card 2 ---------- */
   const tickerWords = ["dày", "rủng rỉnh", "dư dả", "ting ting"];
   const ticker = document.getElementById("ticker");
-  if (!reduceMotion.matches) {
+  if (!reduceMotion.matches && ticker) {
     let t = 0;
     setInterval(() => {
       if (scene.hidden) return;
       t = (t + 1) % tickerWords.length;
       ticker.textContent = tickerWords[t];
-      ticker.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 700, easing: "cubic-bezier(0.16,1,0.3,1)" });
+      ticker.animate([
+        { opacity: 0, transform: "translateY(5px)" },
+        { opacity: 1, transform: "none" }
+      ], { duration: 600, easing: "cubic-bezier(0.16,1,0.3,1)" });
     }, 2200);
   }
 
   /* =========================================================
-     FLOW: gift box -> open -> pastel floral garden + wishes
+     FLOW: 3D Gift Box -> Open -> Pastel Floral Bouquet
      ========================================================= */
-  scene.querySelectorAll(".pop").forEach((el, i) => el.style.setProperty("--i", i + 2));
+  scene.querySelectorAll(".pop").forEach((el, i) => el.style.setProperty("--i", i + 1));
 
   let busy = false;
   const openGift = async () => {
@@ -546,29 +317,26 @@
     playMusic();
 
     gift.classList.add("is-open");
-    await wait(260);
     const [gx, gy] = centerOf(gift);
-    burst(gx, gy - 40, 110, 8.5);
-    await wait(900);
+    burst(gx, gy, 90, 8);
+    await wait(450);
 
     order.classList.add("is-leaving");
-    await wait(700);
+    await wait(600);
     order.hidden = true;
 
     scene.hidden = false;
-    sizeBloom();
-    void scene.offsetWidth;
+    void scene.offsetWidth; // force reflow for smooth animation
     scene.classList.add("is-in");
-    bloomT = 0;
-    bloomStart();
-    const [bx, by] = centerOf(bCanvas);
-    burst(bx, by, 80, 7.5);
-    bCanvas.focus({ preventScroll: true });
+
+    if (bouquetWrapper) {
+      const [bx, by] = centerOf(bouquetWrapper);
+      burst(bx, by, 70, 7);
+    }
     busy = false;
   };
 
   const replay = () => {
-    bloomStop();
     scene.classList.remove("is-in");
     scene.hidden = true;
     gift.classList.remove("is-open");
@@ -583,16 +351,16 @@
   openBtn.addEventListener("click", openGift);
   replayBtn.addEventListener("click", replay);
 
-  /* ---------- lifecycle ---------- */
+  /* ---------- Lifecycle ---------- */
   window.addEventListener("resize", sizePetals);
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) { petalStop(); bloomStop(); }
-    else { petalStart(); if (!scene.hidden) bloomStart(); }
+    if (document.hidden) petalStop();
+    else petalStart();
   });
 
   sizePetals();
   if (!reduceMotion.matches) {
-    const count = pW < 640 ? 16 : 28;
+    const count = pW < 640 ? 14 : 26;
     for (let i = 0; i < count; i++) petals.push(makePetal(false));
     petalStart();
   }
