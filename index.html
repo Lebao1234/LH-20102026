@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>20/10 nhà LightHuman</title>
-  <meta name="description" content="BD Hệ thống gửi tất cả các bạn, các chị em nhà LightHuman một bó hoa 20/10 cùng bốn lời chúc: rạng rỡ, tươi vui, bình an và hạnh phúc." />
+  <title>Chúc mừng 20/10</title>
+  <meta name="description" content="Gửi tất cả các bạn, các chị em một bó hoa 20/10 cùng những lời chúc rạng rỡ, tươi vui, bình an và hạnh phúc." />
   <meta name="theme-color" content="#000000" />
   <link rel="icon" type="image/png" href="img/favicon.png" />
   <link rel="preload" href="Chamhoa.mp3" as="audio" type="audio/mpeg" />
@@ -25,10 +25,8 @@
   <!-- ===== STAGE 1: hộp quà neon ===== -->
   <section class="order" id="order" aria-labelledby="orderTitle">
     <header class="order__header">
-      <!-- Bản logo cho nền tối: chữ trắng, biểu tượng vàng, nền trong suốt -->
-      <img class="order__logo" src="img/logo-lighthuman.png" width="327" height="141" alt="LightHuman Personnel Love" />
       <h1 class="order__title" id="orderTitle">Hộp quà <span class="neon">20/10</span></h1>
-      <p class="order__kicker">Gửi các chị em nhà LightHuman</p>
+      <p class="order__kicker">Xin gửi Thảo 1 hộp quà Li mít tịt từ Lê Bảo</p>
     </header>
 
     <!-- Hộp quà chỉ là hình minh họa bấm được; nút chính bên dưới mới là điểm dừng bàn phím -->
@@ -120,7 +118,7 @@
               <path class="leaf" style="--d:.76s" d="M176 144 q12 -12 22 -6 q-10 14 -22 6 Z" />
             </g>
 
-            <!-- Các bông hoa nở (4 màu đại diện 4 thành viên BD Hệ thống) -->
+            <!-- Các bông hoa nở -->
             <!-- Pink: Minh Hùm - Rạng rỡ -->
             <g class="ln-pink fill-pink" transform="translate(150 80) scale(1.22)"><use class="fl" style="--d:.5s" href="#flw" /></g>
             <g class="ln-pink fill-pink" transform="translate(90 118) scale(.95)"><use class="fl" style="--d:.65s" href="#flw" /></g>
@@ -179,53 +177,34 @@
       <h2 class="scene__title pop" id="sceneTitle"><span class="neon">20/10</span></h2>
       <a class="btn btn--letter pop" href="#letter">
         <i class="ph-light ph-envelope-simple" aria-hidden="true"></i>
-        <span>Mở thư BD Hệ thống</span>
+        <span>Mở lá thư</span>
       </a>
     </div>
 
     <!-- Hai bên bó hoa: trái là lời gửi, phải là ý nghĩa từng bông (màu khớp với người trao ở chương lời chúc) -->
     <div class="scene__side scene__side--left pop">
-      <!-- Xấp ảnh team BD Hệ thống: tự lật lần lượt, bấm để chuyển ảnh -->
-      <button class="team-stack" type="button" id="teamStack" aria-label="Ảnh team BD Hệ thống, bấm để xem ảnh tiếp theo">
-        <span class="team-stack__card"><img src="img/team/bd-1.jpg" width="640" height="480" alt="Bốn thành viên BD Hệ thống khoác vai nhau bên bến thuyền" decoding="async" /><span class="team-stack__caption">BD Hệ thống</span></span>
-        <span class="team-stack__card"><img src="img/team/bd-2.jpg" width="640" height="480" alt="BD Hệ thống đi chơi cùng các bạn, ngồi quanh bàn gỗ giơ tay chữ V" decoding="async" /><span class="team-stack__caption">BD Hệ thống</span></span>
-        <span class="team-stack__card"><img src="img/team/bd-3.jpg" width="640" height="480" alt="Bốn thành viên BD Hệ thống đội mũ bảo hiểm chụp selfie bên đường" decoding="async" /><span class="team-stack__caption">BD Hệ thống</span></span>
-        <span class="team-stack__card"><img src="img/team/bd-4.jpg" width="640" height="480" alt="Bốn thành viên BD Hệ thống đeo kính ngộ nghĩnh chụp ảnh gương" decoding="async" /><span class="team-stack__caption">BD Hệ thống</span></span>
-      </button>
-      <p class="scene__lead"><strong>F4 BD Hệ thống</strong> xin gửi tặng tất cả các bạn, các chị em nhà LightHuman một bó hoa bự chà bá lửa </p>
+      <p class="scene__lead">Đầu tiên là xin gửi tặng Thảo một bó hoa bự chà bá lửa </p>
     </div>
-
     <div class="scene__side scene__side--right pop">
-      <p class="scene__desc">Mỗi bông là một điều tụi mình mong</p>
-      <!-- Ý nghĩa và tên người trao được điền từ mảng TEAM trong script.js;
-           rê chuột / chạm vào một thẻ thì các bông cùng màu trong bó hoa sáng lên -->
-      <ul class="meanings">
-        <li><button class="meaning" type="button" data-flower="pink" aria-pressed="false"><span class="meaning__badge"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg></span><span class="meaning__text"><span class="meaning__name">Rạng rỡ</span><span class="meaning__from"></span></span></button></li>
-        <li><button class="meaning" type="button" data-flower="gold" aria-pressed="false"><span class="meaning__badge"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg></span><span class="meaning__text"><span class="meaning__name">Tươi vui</span><span class="meaning__from"></span></span></button></li>
-        <li><button class="meaning" type="button" data-flower="lilac" aria-pressed="false"><span class="meaning__badge"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg></span><span class="meaning__text"><span class="meaning__name">Bình an</span><span class="meaning__from"></span></span></button></li>
-        <li><button class="meaning" type="button" data-flower="mint" aria-pressed="false"><span class="meaning__badge"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg></span><span class="meaning__text"><span class="meaning__name">Hạnh phúc</span><span class="meaning__from"></span></span></button></li>
-      </ul>
+      <p class="scene__lead">Mỗi bông hoa là một lời chúc rạng rỡ, tươi vui, bình an và hạnh phúc</p>
     </div>
-
-
   </main>
 
-  <!-- ===== Lá thư team Hệ thống: cuộn để xé niêm, thư trượt ra, rồi đọc từng người =====
-       Nội dung 4 lời chúc nằm ở mảng TEAM đầu file script.js -->
+  <!-- ===== Lá thư yêu thương ===== -->
   <section class="letter" id="letter" aria-labelledby="letterTitle">
     <div class="letter__track" id="letterTrack">
       <span class="letter__mark" data-step="torn" style="top: 18%" aria-hidden="true"></span>
       <span class="letter__mark" data-step="out" style="top: 45%" aria-hidden="true"></span>
 
       <div class="letter__sticky">
-        <h2 class="letter__title" id="letterTitle">Thư tay từ <span class="neon">BD Hệ thống</span></h2>
+        <h2 class="letter__title" id="letterTitle">1 Vài Lời Từ <span class="neon">Lê Bảo</span></h2>
 
         <div class="envelope">
           <div class="env__back" aria-hidden="true"></div>
 
           <div class="paper">
-            <p class="paper__greet">Gửi các chị em nhà LightHuman,</p>
-            <p class="paper__text">LightHuman không chỉ tỏa sáng bởi ánh đèn, mà còn bởi những người phụ nữ tuyệt vời đang hiện diện nơi đây.</p>
+            <p class="paper__greet">1 lá thư đặc biệt gửi Thảo,</p>
+            <p class="paper__text">Mỗi ngày đều trở nên rực rỡ và tươi đẹp hơn nhờ nụ cười và sự hiện diện của Thảo.</p>
             <div class="paper__team" id="paperTeam" aria-hidden="true"></div>
           </div>
 
@@ -239,8 +218,8 @@
               <path class="env__band" d="M0 0 L400 0 L400 55 L387.5 64 L375 55 L362.5 64 L350 55 L337.5 64 L325 55 L312.5 64 L300 55 L287.5 64 L275 55 L262.5 64 L250 55 L237.5 64 L225 55 L212.5 64 L200 55 L187.5 64 L175 55 L162.5 64 L150 55 L137.5 64 L125 55 L112.5 64 L100 55 L87.5 64 L75 55 L62.5 64 L50 55 L37.5 64 L25 55 L12.5 64 L0 55 Z" />
               <path class="env__flap" d="M2 2 L200 46 L398 2" />
             </svg>
-            <!-- Con dấu niêm thư là biểu tượng LightHuman -->
-            <span class="env__seal"><img src="img/logo-mark.png" width="155" height="91" alt="" /></span>
+            <!-- Con dấu niêm thư -->
+            <span class="env__seal"><i class="ph-fill ph-heart" style="font-size: 26px; color: var(--color-neon-gold); filter: drop-shadow(0 0 6px var(--color-neon-gold));"></i></span>
           </div>
         </div>
 
@@ -252,7 +231,7 @@
 
   <!-- ===== Bốn bông hoa, bốn lời chúc: các trang thư xếp chồng khi cuộn ===== -->
   <section class="wishes-team" id="wishesTeam" aria-labelledby="wishesTeamTitle">
-    <h2 class="chapter__title" id="wishesTeamTitle">Bốn bông hoa, <span class="neon">bốn lời chúc</span></h2>
+    <h2 class="chapter__title" id="wishesTeamTitle">Lời chúc gửi <span class="neon">Thảo</span></h2>
     <div class="notes" id="notes"></div>
   </section>
 
@@ -264,34 +243,23 @@
       <span class="photo__mark" data-step="flash" data-shot="2" style="top: 66%" aria-hidden="true"></span>
       <span class="photo__mark" data-step="cheer" style="top: 70%" aria-hidden="true"></span>
       <div class="photo__sticky">
-        <h2 class="chapter__title photo__title" id="photoTitle">Và đây là <span class="neon">cả nhà mình</span></h2>
+        <h2 class="chapter__title photo__title" id="photoTitle">Khoảnh khắc Bảo chôm được từ FB và thấy Thảo <span class="neon">rạng rỡ nhất</span></h2>
         <div class="polaroids">
           <figure class="polaroid polaroid--1">
             <div class="polaroid__img">
-              <img src="img/tapthe-1.jpg" width="1600" height="1200" alt="Ảnh tập thể cả nhà LightHuman tại văn phòng, mọi người cùng giơ tay chữ V" decoding="async" />
+              <img src="img/Thao1.jpg" width="1600" height="1200" alt="Ảnh Thảo" decoding="async" />
             </div>
-            <figcaption class="polaroid__caption">Cả nhà LightHuman</figcaption>
           </figure>
           <figure class="polaroid polaroid--2">
             <div class="polaroid__img">
-              <img src="img/tapthe-2.jpg" width="1600" height="1200" alt="Thêm một tấm ảnh tập thể cả nhà LightHuman, hàng trước quỳ gối cùng gấu bông Pikachu" decoding="async" />
+              <img src="img/Thao2.jpg" width="1600" height="1200" alt="Chúc mừng 20/10 Thảo" decoding="async" />
             </div>
-            <figcaption class="polaroid__caption">Chúc mừng 20/10</figcaption>
           </figure>
         </div>
-        <p class="photo__thanks">Cảm ơn vì đã làm cho LightHuman trở nên rực rỡ, vui tươi và đầy sức sống hơn mỗi ngày. Chúc mọi người luôn hạnh phúc, xinh đẹp và tỏa sáng theo cách riêng của mình!</p>
-        <p class="photo__end">Mãi iu cả nhà, <span class="neon">BD Hệ thống</span></p>
+        <p class="photo__thanks">Cảm ơn vì đã làm cho mỗi ngày trở nên rực rỡ, vui tươi và tràn đầy sức sống. Chúc Thảo luôn hạnh phúc, xinh đẹp và tỏa sáng theo cách riêng của mình nhé!</p>
+        <p class="photo__end">Mãi KEOOOO, <span class="neon">Lê Bảo</span></p>
       </div>
     </div>
-  </section>
-
-  <!-- ===== Kết: các ngôi sao nối thành biểu tượng LightHuman, rồi pháo hoa ===== -->
-  <section class="finale" id="finale" aria-labelledby="finaleTitle">
-    <h2 class="chapter__title" id="finaleTitle">Chòm sao <span class="neon">LightHuman</span></h2>
-    <div class="finale__sky" id="finaleSky" aria-hidden="true">
-      <img src="img/logo-mark.png" width="155" height="91" alt="" />
-    </div>
-    <p class="finale__text">Mỗi ngôi sao là một chị em nhà mình, cùng nhau thắp sáng bầu trời LightHuman.</p>
   </section>
 
   <!-- ===== Thanh tiến trình câu chuyện ===== -->
@@ -301,8 +269,7 @@
       <li><a class="story__dot" href="#scene" data-chapter="scene"><span>Bó hoa</span></a></li>
       <li><a class="story__dot" href="#letter" data-chapter="letter"><span>Lá thư</span></a></li>
       <li><a class="story__dot" href="#wishesTeam" data-chapter="wishesTeam"><span>Lời chúc</span></a></li>
-      <li><a class="story__dot" href="#photo" data-chapter="photo"><span>Ảnh tập thể</span></a></li>
-      <li><a class="story__dot" href="#finale" data-chapter="finale"><span>Chòm sao</span></a></li>
+      <li><a class="story__dot" href="#photo" data-chapter="photo"><span>Khoảnh khắc</span></a></li>
     </ol>
   </nav>
 

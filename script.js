@@ -2,7 +2,7 @@
   "use strict";
 
   /* =========================================================
-     BD HỆ THỐNG: mỗi người trao một bông hoa, một lời chúc.
+     LỜI CHÚC 20/10
      Sửa tên, lời chúc, dòng ký tên ở đây. Lời chúc hiện là bản nháp.
      tone: viền thẻ "pink" | "lilac"; flower: "pink" | "gold" | "lilac" | "mint"
      photo: ảnh đại diện trong ô tròn (ảnh vuông, tối thiểu 200x200).
@@ -10,45 +10,15 @@
      ========================================================= */
   const TEAM = [
     {
-      name: "Minh Hùm",
-      photo: "img/team/hum.jpg",
-      role: "BD Hệ thống",
+      name: "Lê Bảo",
+      photo: "",
+      role: "",
       tone: "pink",
       flower: "pink",
       meaning: "Rạng rỡ",
-      wish: "Nhân ngày 20/10, Hùm chúc những bông hoa xinh đẹp của LightHuman luôn giữ được nụ cười, sự tự tin và nguồn năng lượng tích cực vốn có. Cảm ơn mọi người vì đã mang đến sự ấm áp, tinh tế và những điều đẹp đẽ cho tập thể. Mong rằng mỗi ngày của các chị em đều ngập tràn yêu thương, được trân trọng và luôn hạnh phúc với những gì mình lựa chọn.",
-      sign: "Hùm",
-    },
-    {
-      name: "Hòn Trợn",
-      photo: "img/team/tron.jpg",
-      role: "BD Hệ thống",
-      tone: "lilac",
-      flower: "gold",
-      meaning: "Tươi vui",
-      wish: "Chúc các chị em không chỉ có một ngày 20/10 thật vui mà cả 365 ngày trong năm đều được yêu thương đúng cách. Mong mọi người luôn đủ mạnh mẽ để theo đuổi ước mơ, đủ dịu dàng để tận hưởng cuộc sống và đủ tự tin để biết rằng mình xứng đáng với những điều tốt đẹp nhất. Hãy luôn là phiên bản tuyệt vời nhất của chính mình nhé!",
-      sign: "Trợn",
-    },
-    {
-      name: "Tuấn Kẹc",
-      photo: "img/team/kec.jpg",
-      role: "BD Hệ thống",
-      tone: "pink",
-      flower: "lilac",
-      meaning: "Bình an",
-      wish: "Chúc các chị em nhà LightHuman ngày 20/10 luôn xinh đẹp như ảnh đã chỉnh màu, trẻ trung như tuổi trong CV và giàu có như số lần nói “để em làm cho”. Mong mọi người luôn rạng rỡ, vui vẻ, deadline né xa, lương về đúng hẹn và mỗi ngày đi làm đều được đối xử như công chúa, ít nhất là đến giờ tan ca!",
-      sign: "Kẹc",
-    },
-    {
-      name: "Lê Bống",
-      photo: "img/team/bong.jpg",
-      role: "BD Hệ thống",
-      tone: "lilac",
-      flower: "mint",
-      meaning: "Hạnh phúc",
       // \n xuống dòng: thẻ giữ nguyên ngắt dòng (white-space: pre-line)
-      wish: "Chúc các chị em nhà LightHuman luôn:\n– Ví tiền dày hơn áp lực công việc.\n– Nụ cười nhiều hơn số CV cần lọc.\n– Tin nhắn phản hồi nhiều hơn số lần ứng viên “seen không rep”.\nVà luôn tìm được những ứng viên chất lượng nhanh hơn tốc độ quản lý yêu cầu tuyển gấp hệ hệ.",
-      sign: "Bống",
+      wish: "Chúc Thảo ngày 20/10 thật nhiều niềm vui và luôn:\n– Xinh đẹp, rạng rỡ và tươi tắn mỗi ngày.\n– Ví tiền luôn dày hơn áp lực công việc.\n– Nụ cười nhiều hơn deadline và muộn phiền.\nChúc Thảo luôn hạnh phúc, bình an và được yêu thương thật nhiều nhé!",
+      sign: "Bảo",
     },
   ];
 
@@ -439,7 +409,6 @@
 
     drawTrail(dt);
     if (charging) drawCharge(dt, now);
-    if (cons.state !== "idle") drawConstellation(dt, now);
 
     // Flowers flying down from the bouquet into each wish card
     for (let i = flyers.length - 1; i >= 0; i--) {
@@ -571,98 +540,6 @@
       lastBuzz = now;
       buzz(Math.round(8 + 22 * charge));
     }
-  }
-
-  /* ---------- Constellation: stars join into the LightHuman fan mark ---------- */
-  // Vertices traced from the logo file (source pixels; the mark's box starts at 228,55 and is 155x91,
-  // the same crop as img/logo-mark.png, so the stars sit on the faint mark behind them).
-  // Folded blades fan out from a hub near the top: 5 big ones below, 3 slim ones and 2 spikes above.
-  const MARK_BOX = [228, 55, 155, 91];
-  const V = {
-    H: [295, 70],                                   // hub
-    TLs: [280, 57], TRs: [303, 60],                 // small spikes
-    UL: [252, 65], ULb: [260, 76],                  // slim blade, upper left
-    UR: [341, 57], URb: [333, 68],                  // slim blade, upper right
-    RU: [372, 70], RUb: [362, 81],                  // slim blade, right
-    L: [230, 83], Lb: [258, 127], Lf: [263, 96],    // big blade, left (tip, bottom, fold)
-    M: [279, 143], Mf: [287, 104],                  // big blade, left of centre
-    C: [296, 148],                                  // thin centre blade
-    CRf: [300, 118], CR: [325, 146],                // big blade, right of centre
-    Rf: [342, 99], Rb: [356, 132], R: [384, 87],    // big blade, right
-  };
-  const names = Object.keys(V);
-  const idx = Object.fromEntries(names.map((k, i) => [k, i]));
-  const CONS_PTS = names.map((k) => [(V[k][0] - MARK_BOX[0]) / MARK_BOX[2], (V[k][1] - MARK_BOX[1]) / MARK_BOX[3]]);
-  const FOLDS = new Set(["ULb", "URb", "RUb", "Lf", "Mf", "CRf", "Rf"].map((k) => idx[k]));
-
-  // First every ray shoots out from the hub (left to right), then the blade edges close up
-  const RAYS = ["TLs", "UL", "ULb", "L", "Lf", "Mf", "C", "CRf", "Rf", "R", "RUb", "RU", "URb", "UR", "TRs"];
-  const EDGES = [
-    ["UL", "ULb"], ["L", "Lb"], ["Lb", "Lf"], ["Lf", "M"], ["M", "Mf"], ["Mf", "C"],
-    ["CRf", "CR"], ["CR", "Rf"], ["R", "Rb"], ["Rb", "Rf"], ["RU", "RUb"], ["UR", "URb"],
-  ];
-  const CONS_LINES = [
-    ...RAYS.map((k, i) => [idx.H, idx[k], 0.3 + i * 0.07, 0.5]),
-    ...EDGES.map(([a, b], j) => [idx[a], idx[b], 1.5 + j * 0.11, 0.35]),
-  ]; // [from, to, start (s), duration (s)]
-  // A star lights up the moment the first line reaches it
-  const STAR_AT = CONS_PTS.map(() => Infinity);
-  STAR_AT[idx.H] = 0;
-  for (const [a, b, t0, dur] of CONS_LINES) {
-    STAR_AT[a] = Math.min(STAR_AT[a], t0);
-    STAR_AT[b] = Math.min(STAR_AT[b], t0 + dur * 0.9);
-  }
-  const CONS_END = 3.4;
-  const cons = { state: "idle", t: 0 };
-
-  function drawConstellation(dt, now) {
-    cons.t += dt;
-    const r = finaleSky.getBoundingClientRect();
-    if (cons.state === "drawing" && cons.t > CONS_END) {
-      cons.state = "done";
-      finale.classList.add("is-done");
-      fireworks();
-      buzz([20, 60, 30]);
-    }
-    if (r.bottom < -50 || r.top > H + 50) return;
-    const P = CONS_PTS.map(([px, py]) => [r.left + px * r.width, r.top + py * r.height]);
-    ctx.save();
-    ctx.globalCompositeOperation = "lighter";
-    ctx.lineCap = "round";
-    ctx.lineWidth = 1.4;
-    ctx.strokeStyle = rgba(GOLD, 0.6);
-    ctx.shadowColor = rgba(GOLD, 0.9);
-    ctx.shadowBlur = 8;
-    for (const [a, b, t0, dur] of CONS_LINES) {
-      const k = smooth((cons.t - t0) / dur);
-      if (k <= 0) continue;
-      const [x1, y1] = P[a];
-      const [x2, y2] = P[b];
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x1 + (x2 - x1) * k, y1 + (y2 - y1) * k);
-      ctx.stroke();
-    }
-    ctx.shadowBlur = 16;
-    P.forEach(([x, y], i) => {
-      const k = smooth((cons.t - STAR_AT[i]) / 0.35);
-      if (k <= 0) return;
-      const tw = 0.75 + 0.25 * Math.sin(now / 300 + i * 1.7);
-      ctx.fillStyle = rgba([255, 240, 200], tw * k);
-      ctx.beginPath();
-      ctx.arc(x, y, (i === idx.H ? 4 : FOLDS.has(i) ? 2 : 2.8) * k, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    // four-point sparkle on the hub
-    const [ax, ay] = P[idx.H];
-    const s = 14 * smooth(cons.t / 0.4) * (0.8 + 0.2 * Math.sin(now / 200));
-    ctx.strokeStyle = rgba([255, 240, 200], 0.8);
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.moveTo(ax - s, ay); ctx.lineTo(ax + s, ay);
-    ctx.moveTo(ax, ay - s); ctx.lineTo(ax, ay + s);
-    ctx.stroke();
-    ctx.restore();
   }
 
   /* ---------- Gift opening: beam of light, particles gather into "20/10", then scatter ---------- */
@@ -945,8 +822,6 @@
   const paperTeam = document.getElementById("paperTeam");
   const photo = document.getElementById("photo");
   const polaroids = photo.querySelector(".polaroids");
-  const finale = document.getElementById("finale");
-  const finaleSky = document.getElementById("finaleSky");
   const story = document.querySelector(".story");
   const storyDots = [...story.querySelectorAll(".story__dot")];
   const scrollDriven = CSS.supports("animation-timeline: view()");
@@ -1198,28 +1073,13 @@
         burst(r.left + r.width * 0.2, r.top + r.height * 0.3, 50, 300);
         burst(r.right - r.width * 0.2, r.top + r.height * 0.3, 50, 300);
         for (let k = 0; k < 6; k++) plantFlower(r.left + Math.random() * r.width, r.top + Math.random() * r.height);
+        fireworks();
       }
       if (!on) cheered = false;
     });
   }, midline);
   photo.querySelectorAll(".photo__mark").forEach((m) => photoIO.observe(m));
 
-  // Finale: draw the constellation once the sky is half in view; replay it on every visit
-  const resetConstellation = () => {
-    cons.state = "idle";
-    cons.t = 0;
-    finale.classList.remove("is-done");
-  };
-  const finaleIO = new IntersectionObserver((entries) => {
-    entries.forEach((en) => {
-      if (!en.isIntersecting) { resetConstellation(); return; }
-      if (en.intersectionRatio < 0.5 || cons.state !== "idle" || stage2.hidden) return;
-      if (reduceMotion.matches || !raf) { cons.state = "done"; finale.classList.add("is-done"); return; }
-      cons.state = "drawing";
-      cons.t = 0;
-    });
-  }, { threshold: [0, 0.5] });
-  finaleIO.observe(finaleSky);
 
   /* ---------- Night to sunrise: the sky brightens toward the group photo, then night returns for the stars ---------- */
   const root = document.documentElement;
@@ -1230,8 +1090,7 @@
       const mid = window.scrollY + H / 2;
       const a = docTop(letter);
       const b = docTop(photo) + photo.offsetHeight * 0.45;
-      const f = docTop(finale);
-      d = smooth((mid - a) / (b - a)) * (1 - smooth((mid - (f - H * 0.5)) / (H * 0.8)));
+      d = smooth((mid - a) / (b - a));
     }
     if (Math.abs(d - dawn) > 0.004 || (d === 0 && dawn !== 0)) {
       dawn = d;
@@ -1266,35 +1125,6 @@
     });
   }, { rootMargin: "-50% 0px -50% 0px" });
   chapters.forEach((c) => chapterIO.observe(c));
-
-  /* ---------- BD team photo pile: the top polaroid slides off and tucks under, on a timer or on tap ---------- */
-  const teamStack = document.getElementById("teamStack");
-  const teamOrder = [...teamStack.querySelectorAll(".team-stack__card")];
-  const layoutTeam = () => teamOrder.forEach((c, i) => { c.dataset.pos = String(i); });
-  let teamBusy = false;
-  const nextTeam = () => {
-    if (teamBusy) return;
-    if (reduceMotion.matches) { teamOrder.push(teamOrder.shift()); layoutTeam(); return; }
-    teamBusy = true;
-    const top = teamOrder[0];
-    top.classList.add("is-out");
-    setTimeout(() => {
-      top.classList.remove("is-out");
-      teamOrder.push(teamOrder.shift());
-      layoutTeam();
-      teamBusy = false;
-    }, 430);
-  };
-  let teamTimer = 0;
-  const scheduleTeam = () => {
-    clearInterval(teamTimer);
-    teamTimer = setInterval(() => {
-      if (!stage2.hidden && !document.hidden && !reduceMotion.matches) nextTeam();
-    }, 3600);
-  };
-  teamStack.addEventListener("click", () => { nextTeam(); scheduleTeam(); });
-  layoutTeam();
-  scheduleTeam();
 
   /* ---------- Wish cards beside the bouquet: text from TEAM, hover/tap lights up that colour in the bouquet ---------- */
   const meaningBtns = [...document.querySelectorAll(".meaning")];
@@ -1389,7 +1219,6 @@
     trail.length = 0;
     morph = [];
     beam = null;
-    resetConstellation();
     resetMeanings();
     shot.clear();
     window.scrollTo({ top: 0, behavior: "instant" });

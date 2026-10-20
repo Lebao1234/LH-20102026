@@ -1,1445 +1,1445 @@
-/* =========================================================
-   20/10 LightHuman - "Neon đêm"
-   Token source: .claude/skills/design-system/SKILL.md
-   Components reference semantic tokens only; raw values live in :root.
-   ========================================================= */
-
-:root {
-  /* font */
-  --font-family-primary: ui-monospace, "SF Mono", Menlo, Consolas, "Roboto Mono", "DejaVu Sans Mono", monospace;
-  /* handwriting, signatures only */
-  --font-family-script: "Dancing Script", "Segoe Script", "Brush Script MT", cursive;
-  --font-size-xs: 14px;
-  --font-size-sm: 15.5px;
-  --font-size-md: 16px;
-  --font-size-lg: 17px;
-  --font-size-xl: 18px;
-  --font-size-2xl: 19px;
-  --font-size-3xl: 50px;
-  --font-weight-base: 400;
-  --font-line-height-base: normal;
-
-  /* color */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #ffe9f4;
-  --color-text-tertiary: #ffe3f0;
-  --color-surface-base: #000000;
-  --color-border-muted: #ff7ab8;
-  /* Neon line-art accents. Pink + lilac come from the shadow tokens;
-     mint + gold are illustration-only (stems, flower centers), never text on surfaces. */
-  --color-neon-pink: #ff7ab8;
-  --color-neon-lilac: #a99bff;
-  --color-neon-mint: #7dffd0;
-  --color-neon-gold: #ffd98a;
-
-  /* spacing */
-  --space-1: 3.6px;
-  --space-2: 7.5px;
-  --space-3: 7.7px;
-  --space-4: 9px;
-  --space-5: 11.9px;
-  --space-6: 14.25px;
-  --space-7: 15.4px;
-  --space-8: 17px;
-  /* layout spacing is always a multiple of a scale step, never a new value */
-  --space-section: calc(var(--space-8) * 2);
-  --space-page: calc(var(--space-8) * 3);
-
-  /* radius */
-  --radius-xs: 7px;
-  --radius-sm: 9.5px;
-  --radius-md: 10.2px;
-  --radius-lg: 50px;
-
-  /* shadow */
-  --shadow-1: rgba(255, 122, 184, 0.2) 0px 0px 14px 0px, rgba(255, 122, 184, 0.08) 0px 0px 12px 0px inset;
-  --shadow-2: rgba(255, 122, 184, 0.45) 0px 0px 14px 0px, rgba(255, 122, 184, 0.2) 0px 0px 10px 0px inset;
-  --shadow-3: rgba(169, 155, 255, 0.45) 0px 0px 14px 0px, rgba(169, 155, 255, 0.2) 0px 0px 10px 0px inset;
-
-  /* motion */
-  --motion-duration-instant: 200ms;
-  --motion-duration-fast: 700ms;
-  --motion-duration-normal: 900ms;
-  --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-
-  /* semantic glow (text-shadow) */
-  --glow-text: 0 0 8px rgba(255, 255, 255, 0.55), 0 0 26px rgba(255, 122, 184, 0.4);
-  --glow-pink: 0 0 12px var(--color-neon-pink), 0 0 30px var(--color-neon-pink);
-  --focus-ring: 0 0 0 2px var(--color-surface-base), 0 0 0 4px var(--color-text-primary);
-
-  color-scheme: dark;
-}
-
-*, *::before, *::after { box-sizing: border-box; }
-html { background: var(--color-surface-base); }
-
-body {
-  margin: 0;
-  min-height: 100dvh;
-  font-family: var(--font-family-primary);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-base);
-  line-height: var(--font-line-height-base);
-  letter-spacing: 0.03em;
-  color: var(--color-text-primary);
-  background: var(--color-surface-base);
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
-}
-
-h1, h2, p { margin: 0; }
-button { font: inherit; color: inherit; letter-spacing: inherit; }
-[hidden] { display: none !important; }
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-/* ---------- Background: night horizon + canvas fx ---------- */
-.bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(100% 55% at 50% 100%, #14082a 0%, var(--color-surface-base) 72%);
-  overflow: hidden;
-}
-/* Sunrise: --dawn (0..1) is set from the scroll position by script.js.
-   The sky stays dark at the top so text keeps its contrast; only the horizon warms up. */
-.bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg,
-    rgba(20, 8, 48, 0) 0%,
-    rgba(58, 20, 80, 0.5) 45%,
-    rgba(150, 50, 95, 0.55) 72%,
-    rgba(240, 140, 110, 0.6) 92%,
-    rgba(255, 200, 130, 0.7) 100%);
-  opacity: var(--dawn, 0);
-}
-.bg::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: min(70vw, 560px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle,
-    rgba(255, 240, 200, 0.95) 0%,
-    rgba(255, 196, 120, 0.8) 22%,
-    rgba(255, 130, 140, 0.35) 45%,
-    transparent 68%);
-  /* rises from below the horizon as --dawn goes 0 -> 1 */
-  transform: translate(-50%, calc(55% + (1 - var(--dawn, 0)) * 60%));
-  opacity: var(--dawn, 0);
-}
-.fx {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-}
-.fx--top { z-index: 9; } /* above the content, below the pills */
-
-/* ---------- Neon line-art primitives (SVG) ---------- */
-.ln-pink  { stroke: var(--color-neon-pink);  stroke-width: 3; }
-.ln-lilac { stroke: var(--color-neon-lilac); stroke-width: 3; }
-.ln-mint  { stroke: var(--color-neon-mint);  stroke-width: 2.5; }
-.ln-gold  { stroke: var(--color-neon-gold);  stroke-width: 2.5; }
-.thin { stroke-width: 1.6; }
-.dim { opacity: 0.5; }
-.fill-pink  { fill: rgba(255, 122, 184, 0.07); }
-.fill-lilac { fill: rgba(169, 155, 255, 0.1); }
-.fill-gold  { fill: rgba(255, 217, 138, 0.1); }
-.fill-mint  { fill: rgba(125, 255, 208, 0.1); }
-
-.neon {
-  color: var(--color-neon-pink);
-  text-shadow: var(--glow-pink);
-}
-/* Unlit until it scrolls into view, then flickers on like a sign being plugged in */
-.js .neon:not(.is-lit) { opacity: 0.28; text-shadow: none; }
-.neon.is-lit { animation: neonOn 1.3s linear both; }
-.scene .neon.is-lit { animation-delay: 0.5s; } /* wait for the title to rise first */
-@keyframes neonOn {
-  0%       { opacity: 0.28; text-shadow: none; }
-  8%       { opacity: 1;    text-shadow: var(--glow-pink); }
-  12%      { opacity: 0.3;  text-shadow: none; }
-  20%      { opacity: 1;    text-shadow: var(--glow-pink); }
-  24%, 40% { opacity: 0.35; text-shadow: none; }
-  44%      { opacity: 1;    text-shadow: var(--glow-pink); }
-  100%     { opacity: 1;    text-shadow: var(--glow-pink); }
-}
-
-/* ---------- STAGE 1: gift ---------- */
-.order {
-  position: relative;
-  z-index: 2;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-8);
-  padding: var(--space-page) var(--space-8);
-  text-align: center;
-  transition: opacity var(--motion-duration-fast) var(--motion-ease), transform var(--motion-duration-fast) var(--motion-ease);
-  animation: rise var(--motion-duration-normal) var(--motion-ease) backwards;
-}
-.order.is-leaving {
-  opacity: 0;
-  transform: scale(0.96);
-  pointer-events: none;
-}
-
-.order__header {
-  display: grid;
-  gap: var(--space-4);
-  justify-items: center;
-}
-.order__logo {
-  display: block;
-  width: min(220px, 56vw);
-  height: auto;
-  margin-bottom: var(--space-4);
-  /* soft neon halo: white for the wordmark, gold for the mark */
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.28)) drop-shadow(0 0 18px rgba(255, 217, 138, 0.3));
-}
-.order__title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-base);
-  line-height: 1.15;
-  text-wrap: balance;
-  text-shadow: var(--glow-text);
-}
-.order__kicker {
-  font-size: var(--font-size-xl);
-  color: var(--color-text-secondary);
-}
-
-.gift {
-  width: min(260px, 34vh, 70vw);
-  aspect-ratio: 1;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-}
-.gift__svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  filter: drop-shadow(0 0 8px rgba(255, 150, 200, 0.85)) drop-shadow(0 0 30px rgba(255, 122, 184, 0.4));
-  animation: float 4.6s ease-in-out infinite;
-  transition: transform var(--motion-duration-instant) var(--motion-ease);
-}
-.gift:hover .gift__svg { transform: scale(1.05) rotate(-2deg); }
-.gift:active .gift__svg { transform: scale(0.97); }
-.gift__floor { fill: rgba(255, 122, 184, 0.12); stroke: none; }
-.gift__lid {
-  transform-box: fill-box;
-  transform-origin: 0% 100%;
-  transition: transform var(--motion-duration-fast) var(--motion-ease);
-}
-.gift:hover .gift__lid { transform: translateY(-4px) rotate(-3deg); }
-.gift__stars { animation: twinkle 2.4s ease-in-out infinite; }
-
-/* Every few seconds the box rattles, the lid lifts a crack and light leaks out */
-.gift__box {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: peekShake 4.2s ease-in-out 1.5s infinite;
-}
-.gift__lid { animation: peekLid 4.2s ease-in-out 1.5s infinite; }
-.gift__rays { opacity: 0; animation: peekRays 4.2s ease-in-out 1.5s infinite; }
-
-.gift.is-open .gift__box,
-.gift.is-open .gift__lid { animation: none; }
-.gift.is-open .gift__rays { animation: none; opacity: 1; }
-.gift.is-open .gift__lid { transform: translate(-6px, -46px) rotate(-24deg); }
-.gift.is-open .gift__svg { animation: giftOut var(--motion-duration-normal) var(--motion-ease) forwards; }
-
-@keyframes peekShake {
-  0%, 72%, 92%, 100% { rotate: 0deg; }
-  76% { rotate: -4deg; }
-  80% { rotate: 3.5deg; }
-  84% { rotate: -2.5deg; }
-  88% { rotate: 1.5deg; }
-}
-@keyframes peekLid  { 0%, 72%, 96%, 100% { translate: 0 0; } 78%, 90% { translate: 0 -5px; } }
-@keyframes peekRays { 0%, 72%, 96%, 100% { opacity: 0; } 78%, 90% { opacity: 1; } }
-
-/* ---------- Buttons (primary, outlined neon) ---------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  min-height: 48px;
-  padding: var(--space-5) calc(var(--space-8) * 1.5);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-muted);
-  background: transparent;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xl);
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: var(--shadow-2);
-  text-shadow: var(--glow-text);
-  transition: transform var(--motion-duration-instant) var(--motion-ease), box-shadow var(--motion-duration-instant), background var(--motion-duration-instant);
-}
-.btn i { font-size: 20px; color: var(--color-neon-pink); }
-.btn:hover {
-  background: rgba(255, 122, 184, 0.1);
-  transform: translateY(-1px);
-}
-.btn:active { transform: translateY(1px) scale(0.98); }
-.btn:focus-visible { outline: none; box-shadow: var(--focus-ring), var(--shadow-2); }
-.btn:disabled,
-.btn[aria-busy="true"] {
-  cursor: progress;
-  opacity: 0.6;
-  box-shadow: var(--shadow-1);
-  transform: none;
-}
-
-.order__note {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-tertiary);
-}
-
-/* ---------- STAGE 2: scene ---------- */
-.scene {
-  position: relative;
-  z-index: 2;
-  min-height: 100dvh;
-  max-width: 1360px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr minmax(300px, 420px) 1fr;
-  align-items: center;
-  column-gap: var(--space-page);
-  padding: var(--space-page) var(--space-8) calc(var(--space-page) * 2);
-}
-
-/* Center: bouquet + titles */
-.scene__center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  text-align: center;
-}
-
-.bouquet {
-  width: min(300px, 40vh, 72vw);
-  aspect-ratio: 300 / 340;
-  margin-bottom: var(--space-4);
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-md);
-  background: none;
-  cursor: pointer;
-  position: relative;
-}
-/* Glow that breathes with the music; --beat (0..1) is set by script.js */
-.bouquet::before {
-  content: "";
-  position: absolute;
-  inset: 0 -12% 8%;
-  z-index: -1;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(255, 122, 184, 0.32), rgba(169, 155, 255, 0.12) 60%, transparent);
-  opacity: var(--beat, 0);
-  transform: scale(calc(0.85 + var(--beat, 0) * 0.3));
-  pointer-events: none;
-}
-.bouquet:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-
-/* Hold to charge (--charge 0..1 from script.js), release to bloom */
-.bouquet {
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-}
-.bouquet.is-charging::before { opacity: max(var(--beat, 0), var(--charge, 0)); }
-.bouquet.is-charging .bouquet__svg {
-  transform: scale(calc(1 + var(--charge, 0) * 0.07));
-  animation: jitter 90ms linear infinite;
-}
-@keyframes jitter {
-  0%, 100% { translate: 0 0; }
-  25% { translate: calc(var(--charge, 0) * 2px) 0; }
-  50% { translate: 0 calc(var(--charge, 0) * -2px); }
-  75% { translate: calc(var(--charge, 0) * -2px) 0; }
-}
-/* Same bloom as the entrance (unchanged, so it keeps its finished state) plus a spin on top */
-.scene.is-in .bouquet.is-bloom .fl {
-  animation: bloom 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.25) forwards, spinBloom 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
-  animation-delay: var(--d), 0s;
-}
-@keyframes spinBloom { from { rotate: 0deg; scale: 1.4; } to { rotate: 360deg; scale: 1; } }
-.bouquet__svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  filter: drop-shadow(0 0 8px rgba(255, 150, 200, 0.85)) drop-shadow(0 0 32px rgba(255, 122, 184, 0.4));
-  transition: transform var(--motion-duration-instant) var(--motion-ease);
-}
-.bouquet:hover .bouquet__svg { transform: scale(1.03); }
-.bouquet:active .bouquet__svg { transform: scale(0.98); }
-.bouquet__sway {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: sway 4.6s ease-in-out infinite;
-}
-
-.stem { stroke-dasharray: 1; stroke-dashoffset: 1; }
-.leaf { opacity: 0; fill: rgba(125, 255, 208, 0.12); }
-.fl { transform-box: fill-box; transform-origin: center; scale: 0; }
-.scene.is-in .stem { animation: draw var(--motion-duration-normal) ease-out forwards; animation-delay: var(--d); }
-.scene.is-in .leaf { animation: fadeIn var(--motion-duration-fast) ease-out forwards; animation-delay: var(--d); }
-.scene.is-in .fl { animation: bloom 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.25) forwards; animation-delay: var(--d); }
-
-.scene__eyebrow {
-  font-size: var(--font-size-xs);
-  letter-spacing: 0.3em;
-  text-wrap: balance;
-  color: var(--color-text-secondary);
-}
-.scene__title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-base);
-  line-height: 1.1;
-}
-.scene__to {
-  font-size: var(--font-size-2xl);
-  color: var(--color-text-primary);
-  text-shadow: var(--glow-text);
-}
-/* Side texts flank the bouquet on desktop */
-.scene__center { grid-column: 2; grid-row: 1; }
-.scene__side { grid-row: 1; max-width: 30ch; }
-.scene__side--left { grid-column: 1; justify-self: end; text-align: right; }
-.scene__side--right { grid-column: 3; justify-self: start; }
-@media (min-width: 901px) {
-  /* keep clear of the story rail on the right */
-  .scene { padding-right: calc(var(--space-page) * 1.5); }
-}
-@media (max-width: 1200px) {
-  .story .story__dot.is-active span { opacity: 0; }
-  .story .story__dot:hover span, .story .story__dot:focus-visible span { opacity: 1; }
-}
-
-/* BD team photos: a small pile of polaroids; the top one slides off and tucks under (script.js sets data-pos) */
-.team-stack {
-  --w: min(230px, 62vw);
-  position: relative;
-  display: block;
-  width: var(--w);
-  height: calc(var(--w) * 0.75 + 44px);
-  margin: 0 0 var(--space-section) auto;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-}
-.team-stack:focus-visible { outline: none; }
-.team-stack:focus-visible .team-stack__card[data-pos="0"] { box-shadow: var(--focus-ring), var(--shadow-2); }
-.team-stack__card {
-  position: absolute;
-  inset: 0;
-  display: block;
-  padding: 8px 8px 0;
-  border: 1px solid var(--color-border-muted);
-  border-radius: var(--radius-sm);
-  background: #050108;
-  box-shadow: var(--shadow-2), 0 10px 24px rgba(0, 0, 0, 0.6);
-  transition: transform 520ms var(--motion-ease), opacity 520ms var(--motion-ease);
-}
-.team-stack__card:nth-child(even) { border-color: var(--color-neon-lilac); box-shadow: var(--shadow-3), 0 10px 24px rgba(0, 0, 0, 0.6); }
-.team-stack__card img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: var(--radius-xs);
-}
-.team-stack__caption {
-  display: block;
-  padding: 4px 0 6px;
-  text-align: center;
-  font-family: var(--font-family-script);
-  font-size: 20px;
-  letter-spacing: 0;
-  color: var(--color-neon-pink);
-  text-shadow: 0 0 8px rgba(255, 122, 184, 0.6);
-}
-.team-stack__card:nth-child(even) .team-stack__caption { color: var(--color-neon-lilac); text-shadow: 0 0 8px rgba(169, 155, 255, 0.6); }
-.team-stack__card[data-pos="0"] { z-index: 4; transform: rotate(-3deg); }
-.team-stack__card[data-pos="1"] { z-index: 3; transform: translate(12px, 4px) rotate(4deg); }
-.team-stack__card[data-pos="2"] { z-index: 2; transform: translate(-10px, 7px) rotate(-8deg); opacity: 0.9; }
-.team-stack__card[data-pos="3"] { z-index: 1; transform: translate(6px, 10px) rotate(9deg); opacity: 0.8; }
-.team-stack:hover .team-stack__card[data-pos="0"] { transform: rotate(-1deg) scale(1.03); }
-/* the top photo slides off to the side before it tucks under the pile */
-.team-stack__card.is-out { transform: translate(-115%, -14px) rotate(-20deg) !important; opacity: 0 !important; }
-
-.scene__lead {
-  font-size: var(--font-size-2xl);
-  line-height: 1.7;
-  color: var(--color-text-primary);
-  text-shadow: var(--glow-text);
-  text-wrap: balance;
-}
-.scene__lead strong { font-weight: var(--font-weight-base); color: var(--color-neon-pink); text-shadow: var(--glow-pink); }
-
-/* ---------- Four flowers, four wishes: neon cards that light up their flowers in the bouquet ---------- */
-.scene__desc {
-  font-size: var(--font-size-xs);
-  line-height: 1.6;
-  letter-spacing: 0.16em;
-  text-transform: lowercase;
-  text-wrap: balance;
-  color: var(--color-text-tertiary);
-}
-.scene__desc::after { /* a short neon rule under the label */
-  content: "";
-  display: block;
-  width: 72px;
-  height: 1px;
-  margin-top: var(--space-4);
-  background: linear-gradient(90deg, var(--color-neon-pink), transparent);
-  box-shadow: 0 0 6px var(--color-neon-pink);
-}
-.meanings {
-  list-style: none;
-  width: min(270px, 100%);
-  margin: var(--space-7) 0 0;
-  padding: 0;
-  display: grid;
-  gap: var(--space-4);
-}
-.meaning {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  width: 100%;
-  padding: var(--space-4) var(--space-6) var(--space-4) var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--flower) 35%, transparent);
-  border-radius: 999px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--flower) 14%, transparent), rgba(5, 1, 8, 0.6) 70%);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--flower) 18%, transparent), inset 0 0 10px color-mix(in srgb, var(--flower) 10%, transparent);
-  text-align: left;
-  cursor: pointer;
-  transition: transform var(--motion-duration-instant) var(--motion-ease), border-color var(--motion-duration-instant), box-shadow var(--motion-duration-instant);
-}
-.meaning:hover,
-.meaning:focus-visible,
-.meaning[aria-pressed="true"] {
-  transform: translateX(4px);
-  border-color: var(--flower);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--flower) 45%, transparent), inset 0 0 14px color-mix(in srgb, var(--flower) 22%, transparent);
-  outline: none;
-}
-.meaning:focus-visible { box-shadow: var(--focus-ring), 0 0 18px color-mix(in srgb, var(--flower) 45%, transparent); }
-.meaning__badge {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--flower) 60%, transparent);
-  background: radial-gradient(circle, color-mix(in srgb, var(--flower) 22%, transparent), transparent 70%);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--flower) 40%, transparent);
-}
-.meaning__flower {
-  width: 30px;
-  height: 30px;
-  overflow: visible;
-  fill: color-mix(in srgb, var(--flower) 14%, transparent);
-  stroke: var(--flower);
-  stroke-width: 2.4;
-  filter: drop-shadow(0 0 6px var(--flower));
-  animation: meaningSpin 14s linear infinite;
-}
-.meaning:hover .meaning__flower,
-.meaning[aria-pressed="true"] .meaning__flower { animation-duration: 3s; }
-@keyframes meaningSpin { to { rotate: 360deg; } }
-.meaning__text { display: grid; gap: 2px; min-width: 0; }
-.meaning__name {
-  font-size: var(--font-size-xl);
-  color: var(--flower);
-  text-shadow: 0 0 12px var(--flower);
-  white-space: nowrap;
-}
-.meaning__from {
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  color: var(--color-text-tertiary);
-}
-.meaning__from:empty { display: none; }
-
-/* Focus one wish: its flowers in the bouquet brighten, the other colours fade back */
-.bouquet__svg g[class*="fill-"] { transition: opacity 300ms ease, filter 300ms ease; }
-.bouquet[data-focus] .bouquet__svg g[class*="fill-"] { opacity: 0.22; }
-.bouquet[data-focus="pink"] .bouquet__svg g.fill-pink,
-.bouquet[data-focus="gold"] .bouquet__svg g.fill-gold,
-.bouquet[data-focus="lilac"] .bouquet__svg g.fill-lilac,
-.bouquet[data-focus="mint"] .bouquet__svg g.fill-mint { opacity: 1; filter: brightness(1.4); }
-
-/* "Hold the bouquet" hint, right under it */
-.scene__hint {
-  margin: calc(var(--space-4) * -1) 0 var(--space-6);
-  text-wrap: balance;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-tertiary);
-}
-.scene__hint i {
-  display: inline-block;
-  font-size: 18px;
-  vertical-align: -3px;
-  margin-right: var(--space-1);
-  color: var(--color-neon-pink);
-  text-shadow: var(--glow-pink);
-  animation: hintPress 1.8s ease-in-out infinite;
-}
-/* the hand presses down and holds, like the gesture it describes */
-@keyframes hintPress {
-  0%, 100% { translate: 0 0; scale: 1; }
-  30%, 70% { translate: 0 3px; scale: 0.9; }
-}
-.hint--mouse { display: none; }
-@media (hover: hover) and (pointer: fine) {
-  .hint--mouse { display: inline; }
-  .hint--touch { display: none; }
-}
-
-/* Fixed bottom pills */
-.pill {
-  position: fixed;
-  bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
-  z-index: 10;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-4);
-  min-height: 44px;
-  padding: var(--space-4) var(--space-8);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 122, 184, 0.5);
-  background: rgba(0, 0, 0, 0.7);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  box-shadow: var(--shadow-1);
-  transition: transform var(--motion-duration-instant) var(--motion-ease), box-shadow var(--motion-duration-instant);
-}
-.pill--left { left: max(var(--space-8), env(safe-area-inset-left)); }
-.pill--right { right: max(var(--space-8), env(safe-area-inset-right)); }
-.pill i { font-size: 18px; color: var(--color-neon-pink); }
-.pill:hover { box-shadow: var(--shadow-2); transform: translateY(-1px); }
-.pill:active { transform: translateY(1px) scale(0.97); }
-.pill:focus-visible { outline: none; box-shadow: var(--focus-ring), var(--shadow-2); }
-.pill:disabled { cursor: not-allowed; opacity: 0.6; box-shadow: none; transform: none; }
-
-.music[data-state="loading"] { cursor: progress; }
-.music[data-state="error"] { border-color: var(--color-text-tertiary); }
-.music__bars {
-  display: none;
-  align-items: flex-end;
-  gap: 2.5px;
-  width: 18px;
-  height: 15px;
-}
-.music__bars i {
-  display: block;
-  width: 2.5px;
-  height: 100%;
-  background: var(--color-neon-pink);
-  box-shadow: 0 0 6px var(--color-neon-pink);
-  border-radius: 2px;
-  transform-origin: bottom;
-  animation: eq 900ms ease-in-out infinite alternate;
-}
-.music__bars i:nth-child(2) { animation-delay: -300ms; }
-.music__bars i:nth-child(3) { animation-delay: -600ms; }
-.music__bars i:nth-child(4) { animation-delay: -150ms; }
-/* With the analyser running, script.js sets each bar from the real frequency bands */
-.music.is-live .music__bars i { animation: none; transform: scaleY(0.2); transition: transform 90ms linear; }
-.music[data-state="playing"] .music__bars { display: inline-flex; }
-.music[data-state="playing"] .music__icon { display: none; }
-
-/* ---------- Entrance choreography (animation with backwards fill,
-   so the stagger never leaks into hover transitions) ---------- */
-.scene.is-in .pop {
-  animation: rise var(--motion-duration-normal) var(--motion-ease) backwards;
-  animation-delay: calc(var(--i, 0) * 110ms);
-}
-
-@keyframes rise { from { opacity: 0; translate: 0 14px; scale: 0.96; } }
-@keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -9px; } }
-@keyframes sway { 0%, 100% { rotate: -1.2deg; } 50% { rotate: 1.2deg; } }
-@keyframes twinkle { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-@keyframes draw { to { stroke-dashoffset: 0; } }
-@keyframes fadeIn { to { opacity: 1; } }
-@keyframes bloom { from { scale: 0; rotate: -40deg; } to { scale: 1; rotate: 0deg; } }
-@keyframes giftOut {
-  0% { scale: 1; }
-  40% { scale: 1.12; }
-  100% { scale: 1.3; opacity: 0; translate: 0 -30px; }
-}
-@keyframes eq { from { transform: scaleY(0.25); } to { transform: scaleY(1); } }
-
-/* =========================================================
-   Lá thư team Hệ thống
-   Scroll-driven where supported (animation-timeline), class-based
-   fallback (IntersectionObserver adds .is-torn / .is-out / .is-visible).
-   ========================================================= */
-html { scroll-behavior: smooth; }
-
-.btn--letter {
-  margin-top: var(--space-6);
-  text-decoration: none;
-  font-size: var(--font-size-lg);
-}
-
-.letter {
-  position: relative;
-  z-index: 2;
-}
-
-/* Tall track: the sticky stage stays pinned while the track scrolls past */
-.letter__track {
-  position: relative;
-  height: 280vh;
-  view-timeline-name: --envelope;
-}
-.letter__mark { position: absolute; left: 0; width: 1px; height: 1px; }
-
-.letter__sticky {
-  position: sticky;
-  top: 0;
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-section);
-  padding: var(--space-page) var(--space-8);
-  overflow: hidden;
-}
-
-.letter__title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-base);
-  line-height: 1.1;
-  text-align: center;
-  text-wrap: balance;
-  text-shadow: var(--glow-text);
-}
-
-.letter__hint {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-tertiary);
-  letter-spacing: 0.18em;
-}
-
-/* ---------- Envelope (16:10) ---------- */
-.envelope {
-  position: relative;
-  width: min(440px, 86vw);
-  aspect-ratio: 400 / 250;
-  margin-top: calc(var(--space-page) * 3); /* room for the paper to rise */
-  filter: drop-shadow(0 0 8px rgba(255, 150, 200, 0.55)) drop-shadow(0 0 28px rgba(255, 122, 184, 0.25));
-}
-
-.env__back {
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgba(255, 122, 184, 0.4);
-  border-radius: var(--radius-xs);
-  background: #07020d;
-}
-
-.paper {
-  position: absolute;
-  left: 6%;
-  right: 6%;
-  top: 8%;
-  height: 88%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-7) var(--space-8);
-  border: 1px solid var(--color-border-muted);
-  border-radius: var(--radius-sm);
-  background:
-    repeating-linear-gradient(180deg, transparent 0 25px, rgba(255, 122, 184, 0.09) 25px 26px),
-    #050108;
-  box-shadow: var(--shadow-1);
-}
-.paper__greet {
-  font-size: var(--font-size-lg);
-  color: var(--color-text-primary);
-  text-shadow: var(--glow-text);
-}
-.paper__text {
-  font-size: var(--font-size-xs);
-  line-height: 1.6;
-  color: var(--color-text-tertiary);
-}
-.paper__team { display: flex; gap: var(--space-2); margin-top: auto; }
-.paper__team span {
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  border: 1px solid currentColor;
-  font-size: 11px;
-  color: var(--color-neon-pink);
-}
-.paper__team span:nth-child(even) { color: var(--color-neon-lilac); }
-
-.env__front {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.env__pocket { fill: var(--color-surface-base); stroke: var(--color-neon-pink); stroke-width: 2; }
-.env__fold { stroke: var(--color-neon-lilac); stroke-width: 1.5; opacity: 0.8; }
-
-.env__strip {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  aspect-ratio: 400 / 64;
-  transform-origin: 0% 100%;
-}
-.env__strip svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.env__band { fill: var(--color-surface-base); stroke: var(--color-neon-pink); stroke-width: 2; }
-.env__flap { stroke: var(--color-neon-lilac); stroke-width: 1.5; opacity: 0.8; }
-.env__seal {
-  position: absolute;
-  left: 50%;
-  top: 72%;
-  width: 60px;
-  height: 60px;
-  translate: -50% -50%;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  border: 1px solid var(--color-neon-gold);
-  background: var(--color-surface-base);
-  box-shadow: 0 0 14px rgba(255, 217, 138, 0.45), inset 0 0 10px rgba(255, 217, 138, 0.2);
-}
-.env__seal img {
-  width: 42px;
-  height: auto;
-  filter: drop-shadow(0 0 4px rgba(255, 217, 138, 0.7));
-}
-
-/* ---------- Chapter headings (shared) ---------- */
-.chapter__title {
-  margin: 0 0 var(--space-page);
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-base);
-  line-height: 1.1;
-  text-align: center;
-  text-wrap: balance;
-  text-shadow: var(--glow-text);
-}
-
-/* ---------- Chapter 3: four flowers, four wishes (sticky stack) ---------- */
-.wishes-team {
-  position: relative;
-  z-index: 2;
-  padding: var(--space-page) var(--space-8) 0;
-}
-.notes {
-  max-width: 600px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 45vh;
-  padding-bottom: 35vh;
-}
-
-/* Each page pins a little lower than the one before, so they pile up like letters.
-   .note carries pinning + scroll entrance; .note__card carries the paper and the 3D tilt. */
-.note {
-  position: sticky;
-  top: calc(12vh + var(--i, 0) * 28px);
-  width: 100%;
-  rotate: var(--tilt, 0deg);
-}
-.note__card {
-  position: relative;
-  padding: var(--space-section) var(--space-section) var(--space-8);
-  border: 1px solid rgba(255, 122, 184, 0.55);
-  border-radius: var(--radius-md);
-  background:
-    repeating-linear-gradient(180deg, transparent 0 30px, rgba(255, 122, 184, 0.07) 30px 31px),
-    #050108;
-  box-shadow: var(--shadow-2), 0 -18px 40px rgba(0, 0, 0, 0.7);
-  /* --rx/--ry/--gx/--gy are set on #notes by script.js (mouse or gyroscope) */
-  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform 500ms var(--motion-ease);
-}
-/* Soft sheen that slides across the paper as it tilts */
-.note__card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255, 255, 255, 0.07), transparent 55%);
-  pointer-events: none;
-}
-.note--lilac .note__card { border-color: rgba(169, 155, 255, 0.6); box-shadow: var(--shadow-3), 0 -18px 40px rgba(0, 0, 0, 0.7); }
-.note:nth-child(odd) { --tilt: -1.2deg; }
-.note:nth-child(even) { --tilt: 1.4deg; }
-
-.note__head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  margin-bottom: var(--space-8);
-}
-.note__avatar {
-  flex: none;
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  border: 1px solid currentColor;
-  font-size: var(--font-size-lg);
-  color: var(--color-neon-pink);
-  text-shadow: var(--glow-pink);
-  box-shadow: 0 0 14px rgba(255, 122, 184, 0.4), inset 0 0 10px rgba(255, 122, 184, 0.2);
-}
-/* Photo avatars: the neon ring stays, the photo sits just inside it */
-.note__avatar.has-photo,
-.paper__team span.has-photo { padding: 2px; overflow: hidden; }
-.note__avatar.has-photo { width: 64px; height: 64px; }
-.note__avatar img,
-.paper__team img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-.note--lilac .note__avatar {
-  color: var(--color-neon-lilac);
-  text-shadow: 0 0 12px var(--color-neon-lilac);
-  box-shadow: 0 0 14px rgba(169, 155, 255, 0.4), inset 0 0 10px rgba(169, 155, 255, 0.2);
-}
-.note__name {
-  margin: 0;
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-base);
-  color: var(--color-text-primary);
-  text-shadow: var(--glow-text);
-}
-.note__role { font-size: var(--font-size-xs); color: var(--color-text-tertiary); margin-top: var(--space-1); }
-
-/* The flower this person hands over */
-.note__gift {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-7);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-tertiary);
-}
-.note__gift strong {
-  font-weight: var(--font-weight-base);
-  font-size: var(--font-size-xl);
-  color: var(--flower);
-  text-shadow: 0 0 12px var(--flower);
-}
-.note__flower {
-  width: 34px;
-  height: 34px;
-  overflow: visible;
-  fill: color-mix(in srgb, var(--flower) 12%, transparent);
-  stroke: var(--flower);
-  stroke-width: 2.4;
-  filter: drop-shadow(0 0 6px var(--flower));
-  opacity: 0.25;
-  scale: 0.7;
-  transition: opacity var(--motion-duration-instant), scale var(--motion-duration-instant);
-}
-/* The flower flown in from the bouquet lands here */
-.note.is-received .note__flower { opacity: 1; scale: 1; animation: receive 600ms var(--motion-ease); }
-@keyframes receive { 0% { scale: 0.6; } 45% { scale: 1.4; } 100% { scale: 1; } }
-[data-flower="pink"]  { --flower: var(--color-neon-pink); }
-[data-flower="gold"]  { --flower: var(--color-neon-gold); }
-[data-flower="lilac"] { --flower: var(--color-neon-lilac); }
-[data-flower="mint"]  { --flower: var(--color-neon-mint); }
-
-.note__wish {
-  white-space: pre-line;
-  font-size: var(--font-size-lg);
-  line-height: 1.8;
-  color: var(--color-text-secondary);
-}
-/* Typewriter: the caret is an empty inline border so it never adds a wrap point mid-word */
-.wish__ghost { color: transparent; }
-.wish__caret { display: none; }
-.note.is-typing .wish__caret {
-  display: inline;
-  margin-right: -2px;
-  border-left: 2px solid var(--flower);
-  box-shadow: 0 0 8px var(--flower);
-  animation: caret 0.9s steps(1) infinite;
-}
-@keyframes caret { 50% { opacity: 0; } }
-
-/* Handwritten signature, drawn in neon once the wish is typed */
-.note__sign {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-6);
-  color: var(--flower);
-}
-.sign__svg { flex: 1; min-width: 0; height: 52px; overflow: visible; }
-.sign__svg text {
-  font-family: var(--font-family-script);
-  font-size: 36px;
-  letter-spacing: 0;
-  fill: transparent;
-  stroke: var(--flower);
-  stroke-width: 1.1;
-  stroke-dasharray: 260;
-  stroke-dashoffset: 260;
-  filter: drop-shadow(0 0 4px var(--flower));
-}
-.note.is-signed .sign__svg text { animation: sign 2.4s ease-out forwards; }
-@keyframes sign {
-  65%  { stroke-dashoffset: 0; fill: transparent; }
-  100% { stroke-dashoffset: 0; fill: color-mix(in srgb, var(--flower) 85%, transparent); }
-}
-.note__sign i {
-  display: inline-block;
-  font-size: 22px;
-  text-shadow: 0 0 10px var(--flower);
-  opacity: 0;
-  scale: 0.4;
-  transition: opacity 400ms ease 1.6s, scale 500ms cubic-bezier(0.2, 0.9, 0.3, 1.5) 1.6s;
-}
-.note.is-signed .note__sign i { opacity: 1; scale: 1; }
-
-/* ---------- Chapter 4: group photos (two polaroids develop on scroll) ---------- */
-.photo { position: relative; z-index: 2; }
-/* Fly-in start positions sit off-screen; clip them so phones never zoom out.
-   overflow: clip (not hidden) keeps position: sticky working. */
-.scene, .letter, .wishes-team, .photo { overflow-x: clip; }
-.photo__track {
-  position: relative;
-  height: 300vh;
-  view-timeline-name: --photo;
-}
-.photo__mark { position: absolute; left: 0; width: 1px; height: 1px; }
-.photo__sticky {
-  position: sticky;
-  top: 0;
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-section);
-  padding: var(--space-page) var(--space-8);
-  overflow: hidden;
-}
-.photo__title { margin: 0; }
-
-.polaroids {
-  /* height budget: title, thank-you line, signature line and gaps take ~450px */
-  --pw: min(440px, 40vw, calc((100dvh - 450px) * 1.33));
-  display: grid;
-  grid-template-columns: repeat(2, var(--pw));
-  gap: var(--space-section);
-}
-.polaroid {
-  margin: 0;
-  width: var(--pw);
-  padding: var(--space-6) var(--space-6) 0;
-  border: 1px solid var(--color-border-muted);
-  border-radius: var(--radius-md);
-  background: #050108;
-  box-shadow: var(--shadow-2);
-}
-.polaroid--1 { rotate: -3deg; }
-.polaroid--2 { rotate: 2.5deg; border-color: var(--color-neon-lilac); box-shadow: var(--shadow-3); }
-.polaroid__img {
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-radius: var(--radius-xs);
-  border: 1px solid rgba(255, 122, 184, 0.3);
-  background: #0a0410;
-}
-.polaroid__img img { display: block; width: 100%; height: 100%; object-fit: cover; }
-
-/* Camera flash on just this photo (pseudo-elements, so the polaroid's own
-   scroll-driven entrance animation is left untouched) */
-.polaroid { position: relative; }
-.polaroid__img { position: relative; }
-.polaroid__img::after,
-.polaroid::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  opacity: 0;
-}
-.polaroid__img::after {
-  inset: 0;
-  background: radial-gradient(circle at 50% 45%, #fff 0%, rgba(255, 245, 250, 0.9) 55%, rgba(255, 225, 240, 0.75) 100%);
-}
-.polaroid::after {
-  inset: -1px;
-  border-radius: inherit;
-  box-shadow: 0 0 0 2px #fff, 0 0 28px 6px rgba(255, 255, 255, 0.8), 0 0 60px 12px rgba(255, 200, 230, 0.5);
-}
-.polaroid.is-flash .polaroid__img::after,
-.polaroid.is-flash::after { animation: cameraFlash 650ms ease-out; }
-@keyframes cameraFlash { 0% { opacity: 0; } 8% { opacity: 0.9; } 100% { opacity: 0; } }
-.polaroid__caption {
-  padding: var(--space-7) var(--space-4) var(--space-8);
-  text-align: center;
-  font-size: var(--font-size-sm);
-  line-height: 1.6;
-  color: var(--color-text-secondary);
-}
-.photo__thanks {
-  max-width: 72ch;
-  font-size: var(--font-size-lg);
-  line-height: 1.7;
-  text-align: center;
-  text-wrap: balance;
-  color: var(--color-text-secondary);
-  text-shadow: 0 0 6px var(--color-surface-base), 0 0 14px var(--color-surface-base); /* stays legible over the neon grass */
-}
-/* The thank-you line sits right above the signature, so the gap between them is tighter */
-.photo__thanks + .photo__end { margin-top: calc(var(--space-8) - var(--space-section)); }
-.photo__end {
-  font-size: var(--font-size-2xl);
-  text-align: center;
-  text-wrap: balance;
-  /* dark halo first: this line sits right in front of the rising sun */
-  text-shadow: 0 0 6px var(--color-surface-base), 0 0 14px var(--color-surface-base), var(--glow-text);
-}
-.photo__end .neon.is-lit { text-shadow: 0 0 6px var(--color-surface-base), 0 0 14px var(--color-surface-base), var(--glow-pink); }
-
-/* ---------- Chapter 5: the LightHuman constellation (drawn on the canvas over .finale__sky) ---------- */
-.finale {
-  position: relative;
-  z-index: 2;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-section);
-  padding: var(--space-page) var(--space-8) calc(var(--space-page) * 2);
-  text-align: center;
-}
-.finale .chapter__title { margin: 0; }
-.finale__sky {
-  width: min(560px, 86vw);
-  aspect-ratio: 155 / 91;
-}
-/* The real mark glows in faintly behind the stars once they are all joined */
-.finale__sky img {
-  display: block;
-  width: 100%;
-  height: auto;
-  opacity: 0;
-  /* the source mark is small; a light blur turns its pixels into a soft glow */
-  filter: blur(2px) drop-shadow(0 0 18px rgba(255, 217, 138, 0.6));
-  transition: opacity 1.6s ease;
-}
-.finale.is-done .finale__sky img { opacity: 0.22; }
-.finale__text {
-  max-width: 40ch;
-  font-size: var(--font-size-xl);
-  line-height: 1.7;
-  color: var(--color-text-secondary);
-  text-wrap: balance;
-  text-shadow: var(--glow-text);
-  opacity: 0;
-  translate: 0 12px;
-  transition: opacity var(--motion-duration-normal) var(--motion-ease) 0.4s, translate var(--motion-duration-normal) var(--motion-ease) 0.4s;
-}
-.finale.is-done .finale__text { opacity: 1; translate: 0 0; }
-
-/* ---------- Story progress: right rail (desktop), top bar (mobile) ---------- */
-.story {
-  position: fixed;
-  right: max(var(--space-8), env(safe-area-inset-right));
-  top: 50%;
-  translate: 0 -50%;
-  z-index: 10;
-}
-.story__line {
-  position: absolute;
-  right: 5px;
-  top: 6px;
-  bottom: 6px;
-  width: 1px;
-  background: rgba(255, 122, 184, 0.25);
-}
-.story__fill {
-  position: absolute;
-  inset: 0;
-  background: var(--color-neon-pink);
-  box-shadow: 0 0 8px var(--color-neon-pink);
-  transform-origin: 50% 0%;
-  transform: scaleY(var(--story, 0));
-  transition: transform var(--motion-duration-fast) var(--motion-ease);
-}
-.story__list {
-  position: relative;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--space-section) * 1.5);
-}
-.story__dot {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--space-4);
-  min-height: 24px;
-  color: var(--color-text-tertiary);
-  font-size: var(--font-size-xs);
-  text-decoration: none;
-}
-.story__dot::after {
-  content: "";
-  flex: none;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  border: 1px solid var(--color-neon-pink);
-  background: var(--color-surface-base);
-  box-shadow: var(--shadow-1);
-  transition: background var(--motion-duration-instant), box-shadow var(--motion-duration-instant);
-}
-.story__dot span {
-  opacity: 0;
-  translate: 6px 0;
-  transition: opacity var(--motion-duration-instant), translate var(--motion-duration-instant);
-}
-.story__dot:hover span,
-.story__dot:focus-visible span,
-.story__dot.is-active span { opacity: 1; translate: 0 0; }
-.story__dot.is-active::after { background: var(--color-neon-pink); box-shadow: 0 0 10px var(--color-neon-pink), 0 0 20px var(--color-neon-pink); }
-.story__dot:hover::after { box-shadow: var(--shadow-2); }
-.story__dot:focus-visible { outline: none; }
-.story__dot:focus-visible::after { box-shadow: var(--focus-ring); }
-
-/* ---------- Motion ---------- */
-@keyframes tearOff {
-  0%   { transform: none; opacity: 1; }
-  25%  { transform: translate(1%, -6%) rotate(-3deg); }
-  100% { transform: translate(38%, -260%) rotate(-28deg); opacity: 0; }
-}
-@keyframes paperOut { to { transform: translateY(-74%); } }
-@keyframes envSink  { to { transform: translateY(12%) scale(0.96); opacity: 0.35; } }
-@keyframes hintOut  { to { opacity: 0; } }
-@keyframes noteIn   { from { opacity: 0; transform: translateY(80px) rotate(var(--tilt-in, -5deg)); } }
-@keyframes polaroidIn  { from { opacity: 0; transform: translate(-30%, 90px) rotate(-12deg) scale(0.85); } }
-@keyframes polaroidIn2 { from { opacity: 0; transform: translate(60%, 60px) rotate(16deg) scale(0.85); } }
-@keyframes develop  { from { filter: blur(12px) grayscale(1) brightness(0.3); } }
-@keyframes fadeUp   { from { opacity: 0; transform: translateY(20px); } }
-@keyframes storyY   { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-@keyframes storyX   { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .env__strip, .paper, .envelope, .letter__hint {
-      animation-timing-function: linear;
-      animation-fill-mode: both;
-      animation-timeline: --envelope;
-    }
-    .letter__hint { animation-name: hintOut;  animation-range: contain 0% contain 6%; }
-    .env__strip   { animation-name: tearOff;  animation-range: contain 4% contain 32%; }
-    .paper        { animation-name: paperOut; animation-range: contain 28% contain 68%; }
-    .envelope     { animation-name: envSink;  animation-range: contain 74% contain 100%; }
-
-    .note {
-      animation: noteIn linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 100%;
-    }
-    .note:nth-child(even) { --tilt-in: 5deg; }
-
-    .polaroid, .polaroid__img img, .photo__title, .photo__thanks, .photo__end {
-      animation-timing-function: linear;
-      animation-fill-mode: both;
-      animation-timeline: --photo;
-    }
-    .photo__thanks { animation-name: fadeUp; animation-range: contain 68% contain 84%; }
-    .photo__title { animation-name: fadeUp; animation-range: contain 0% contain 12%; }
-    /* Photo 1 lands and develops, then photo 2 flies in beside it */
-    .polaroid--1 { animation-name: polaroidIn;  animation-range: contain 0% contain 28%; }
-    .polaroid--1 .polaroid__img img { animation-name: develop; animation-range: contain 12% contain 42%; }
-    .polaroid--2 { animation-name: polaroidIn2; animation-range: contain 36% contain 62%; }
-    .polaroid--2 .polaroid__img img { animation-name: develop; animation-range: contain 46% contain 76%; }
-    .photo__end { animation-name: fadeUp; animation-range: contain 74% contain 90%; }
-
-    /* Phones: photos stack, so each one reveals as it enters view */
-    @media (max-width: 640px) {
-      .polaroid, .polaroid__img img, .photo__title, .photo__thanks, .photo__end { animation-timeline: view(); }
-      .photo__title, .photo__thanks { animation-range: entry 0% entry 100%; }
-      .polaroid--1, .polaroid--2 { animation-range: entry 0% cover 40%; }
-      .polaroid--1 .polaroid__img img,
-      .polaroid--2 .polaroid__img img { animation-range: entry 40% cover 50%; }
-      .photo__end { animation-range: entry 0% entry 100%; }
-    }
-  }
-
-  /* Fallback: discrete steps driven by IntersectionObserver classes */
-  @supports not (animation-timeline: view()) {
-    .env__strip { transition: transform var(--motion-duration-normal) var(--motion-ease), opacity var(--motion-duration-normal); }
-    .paper { transition: transform var(--motion-duration-normal) var(--motion-ease); }
-    .letter__hint { transition: opacity var(--motion-duration-fast); }
-    .letter.is-torn .letter__hint { opacity: 0; }
-    .letter.is-torn .env__strip { transform: translate(38%, -260%) rotate(-28deg); opacity: 0; }
-    .letter.is-out .paper { transform: translateY(-74%); }
-
-    .note { transition: opacity var(--motion-duration-normal) var(--motion-ease), transform var(--motion-duration-normal) var(--motion-ease); }
-    .note:not(.is-visible) { opacity: 0; transform: translateY(80px); }
-
-    .polaroid, .photo__thanks, .photo__end { transition: opacity var(--motion-duration-normal) var(--motion-ease), transform var(--motion-duration-normal) var(--motion-ease); }
-    .polaroid__img img { transition: filter 1.6s var(--motion-ease); }
-    .polaroid--2, .polaroid--2 .polaroid__img img { transition-delay: 0.5s; }
-    .photo__thanks { transition-delay: 0.8s; }
-    .photo__end { transition-delay: 1.1s; }
-    .photo:not(.is-in) .polaroid--1 { opacity: 0; transform: translate(-30%, 90px) rotate(-12deg) scale(0.85); }
-    .photo:not(.is-in) .polaroid--2 { opacity: 0; transform: translate(60%, 60px) rotate(16deg) scale(0.85); }
-    .photo:not(.is-in) .polaroid__img img { filter: blur(12px) grayscale(1) brightness(0.3); }
-    .photo:not(.is-in) .photo__thanks,
-    .photo:not(.is-in) .photo__end { opacity: 0; transform: translateY(20px); }
-  }
-}
-
-/* Story rail follows real scroll position where supported (not motion, it is a position readout) */
-@supports (animation-timeline: scroll()) {
-  .story__fill { transition: none; animation: storyY linear both; animation-timeline: scroll(root); }
-}
-
-/* Reduced motion: letter already open, photo developed, no pinning */
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .letter__track, .photo__track { height: auto; }
-  .letter__sticky, .photo__sticky { position: relative; height: auto; overflow: visible; }
-  .letter__hint, .env__strip { display: none; }
-  .paper { transform: translateY(-74%); }
-  .wishes-team { padding-top: 0; }
-  .notes { gap: var(--space-section); padding-bottom: var(--space-page); }
-  .note { position: relative; top: auto; }
-  .story__fill { animation: none !important; }
-}
-
-@media (max-width: 900px) {
-  /* Story rail becomes a thin progress bar on top */
-  .story { top: 0; left: 0; right: 0; translate: none; height: 3px; }
-  .story__line { inset: 0; width: auto; height: 3px; background: rgba(255, 122, 184, 0.18); }
-  .story__fill { transform-origin: 0% 50%; transform: scaleX(var(--story, 0)); }
-  .story__list { display: none; }
-  @supports (animation-timeline: scroll()) {
-    .story__fill { animation-name: storyX; }
-  }
-}
-
-@media (max-width: 640px) {
-  .note { --tilt: 0deg !important; top: calc(10vh + var(--i, 0) * 18px); }
-  .note__card { padding: var(--space-8); }
-  .sign__svg { height: 46px; }
-  .sign__svg text { font-size: 32px; }
-  .note__wish { font-size: var(--font-size-md); line-height: 1.7; }
-  /* Phones: keep the opening line, drop the initials row to make room */
-  .paper { padding: var(--space-5) var(--space-6); }
-  .paper__text { font-size: 13px; line-height: 1.55; }
-  .paper__team { display: none; }
-}
-
-/* ---------- Responsive ---------- */
-@media (max-width: 900px) {
-  .scene__side { max-width: 36ch; text-align: center; }
-  .team-stack { margin-inline: auto; } /* centred once the sides stack under the bouquet */
-  .scene__desc::after { margin-inline: auto; background: linear-gradient(90deg, transparent, var(--color-neon-pink), transparent); }
-  .meanings { width: min(420px, 100%); margin-inline: auto; grid-template-columns: repeat(2, 1fr); }
-  .meaning { gap: var(--space-4); padding-right: var(--space-4); }
-  .meaning:hover, .meaning:focus-visible, .meaning[aria-pressed="true"] { transform: translateY(-2px); }
-  .meaning__badge { width: 36px; height: 36px; }
-  .meaning__flower { width: 24px; height: 24px; }
-  .meaning__name { font-size: var(--font-size-md); }
-  .scene {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-8);
-    padding: var(--space-section) var(--space-8) calc(var(--space-page) * 2);
-  }
-}
-
-@media (max-width: 640px) {
-  .photo__track { height: auto; }
-  .photo__sticky { position: relative; height: auto; overflow: visible; padding-bottom: calc(var(--space-page) * 2); }
-  .polaroids { --pw: min(100%, 420px); grid-template-columns: var(--pw); justify-content: center; width: 100%; }
-}
-
-@media (max-width: 480px) {
-  .order__title, .scene__title { line-height: 1.1; }
-  .scene__eyebrow { letter-spacing: 0.18em; }
-  .pill__label { display: none; }
-  .pill { padding: var(--space-4) var(--space-5); }
-}
-
-/* ---------- Reduced motion: loops off, reveals instant, art fully drawn ---------- */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    animation-delay: 0ms !important;
-    transition-duration: 0.01ms !important;
-  }
-  .gift__svg, .bouquet__sway, .gift__stars, .gift__box, .gift__lid { animation: none !important; }
-  .gift__rays { animation: none !important; opacity: 0; }
-  .scene__hint { display: none; } /* hold-to-bloom is off with reduced motion */
-  .note__card { transform: none; }
-  .note__flower { opacity: 1; scale: 1; }
-  .sign__svg text { stroke-dashoffset: 0; fill: color-mix(in srgb, var(--flower) 85%, transparent); }
-  .note__sign i { opacity: 1; scale: 1; }
-  .js .neon:not(.is-lit) { opacity: 1; text-shadow: var(--glow-pink); }
-  .finale__sky img { opacity: 0.8; }
-  .finale__text { opacity: 1; translate: 0 0; }
-  .polaroid__img::after, .polaroid::after { display: none; }
-  .stem { stroke-dashoffset: 0; }
-  .leaf { opacity: 1; }
-  .fl { scale: 1; }
-}
+/* =========================================================
+   20/10 LightHuman - "Neon đêm"
+   Token source: .claude/skills/design-system/SKILL.md
+   Components reference semantic tokens only; raw values live in :root.
+   ========================================================= */
+
+:root {
+  /* font */
+  --font-family-primary: ui-monospace, "SF Mono", Menlo, Consolas, "Roboto Mono", "DejaVu Sans Mono", monospace;
+  /* handwriting, signatures only */
+  --font-family-script: "Dancing Script", "Segoe Script", "Brush Script MT", cursive;
+  --font-size-xs: 14px;
+  --font-size-sm: 15.5px;
+  --font-size-md: 16px;
+  --font-size-lg: 17px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 19px;
+  --font-size-3xl: 50px;
+  --font-weight-base: 400;
+  --font-line-height-base: normal;
+
+  /* color */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #ffe9f4;
+  --color-text-tertiary: #ffe3f0;
+  --color-surface-base: #000000;
+  --color-border-muted: #ff7ab8;
+  /* Neon line-art accents. Pink + lilac come from the shadow tokens;
+     mint + gold are illustration-only (stems, flower centers), never text on surfaces. */
+  --color-neon-pink: #ff7ab8;
+  --color-neon-lilac: #a99bff;
+  --color-neon-mint: #7dffd0;
+  --color-neon-gold: #ffd98a;
+
+  /* spacing */
+  --space-1: 3.6px;
+  --space-2: 7.5px;
+  --space-3: 7.7px;
+  --space-4: 9px;
+  --space-5: 11.9px;
+  --space-6: 14.25px;
+  --space-7: 15.4px;
+  --space-8: 17px;
+  /* layout spacing is always a multiple of a scale step, never a new value */
+  --space-section: calc(var(--space-8) * 2);
+  --space-page: calc(var(--space-8) * 3);
+
+  /* radius */
+  --radius-xs: 7px;
+  --radius-sm: 9.5px;
+  --radius-md: 10.2px;
+  --radius-lg: 50px;
+
+  /* shadow */
+  --shadow-1: rgba(255, 122, 184, 0.2) 0px 0px 14px 0px, rgba(255, 122, 184, 0.08) 0px 0px 12px 0px inset;
+  --shadow-2: rgba(255, 122, 184, 0.45) 0px 0px 14px 0px, rgba(255, 122, 184, 0.2) 0px 0px 10px 0px inset;
+  --shadow-3: rgba(169, 155, 255, 0.45) 0px 0px 14px 0px, rgba(169, 155, 255, 0.2) 0px 0px 10px 0px inset;
+
+  /* motion */
+  --motion-duration-instant: 200ms;
+  --motion-duration-fast: 700ms;
+  --motion-duration-normal: 900ms;
+  --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* semantic glow (text-shadow) */
+  --glow-text: 0 0 8px rgba(255, 255, 255, 0.55), 0 0 26px rgba(255, 122, 184, 0.4);
+  --glow-pink: 0 0 12px var(--color-neon-pink), 0 0 30px var(--color-neon-pink);
+  --focus-ring: 0 0 0 2px var(--color-surface-base), 0 0 0 4px var(--color-text-primary);
+
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--color-surface-base); }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-base);
+  line-height: var(--font-line-height-base);
+  letter-spacing: 0.03em;
+  color: var(--color-text-primary);
+  background: var(--color-surface-base);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, p { margin: 0; }
+button { font: inherit; color: inherit; letter-spacing: inherit; }
+[hidden] { display: none !important; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Background: night horizon + canvas fx ---------- */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(100% 55% at 50% 100%, #14082a 0%, var(--color-surface-base) 72%);
+  overflow: hidden;
+}
+/* Sunrise: --dawn (0..1) is set from the scroll position by script.js.
+   The sky stays dark at the top so text keeps its contrast; only the horizon warms up. */
+.bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(20, 8, 48, 0) 0%,
+    rgba(58, 20, 80, 0.5) 45%,
+    rgba(150, 50, 95, 0.55) 72%,
+    rgba(240, 140, 110, 0.6) 92%,
+    rgba(255, 200, 130, 0.7) 100%);
+  opacity: var(--dawn, 0);
+}
+.bg::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(70vw, 560px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 240, 200, 0.95) 0%,
+    rgba(255, 196, 120, 0.8) 22%,
+    rgba(255, 130, 140, 0.35) 45%,
+    transparent 68%);
+  /* rises from below the horizon as --dawn goes 0 -> 1 */
+  transform: translate(-50%, calc(55% + (1 - var(--dawn, 0)) * 60%));
+  opacity: var(--dawn, 0);
+}
+.fx {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+.fx--top { z-index: 9; } /* above the content, below the pills */
+
+/* ---------- Neon line-art primitives (SVG) ---------- */
+.ln-pink  { stroke: var(--color-neon-pink);  stroke-width: 3; }
+.ln-lilac { stroke: var(--color-neon-lilac); stroke-width: 3; }
+.ln-mint  { stroke: var(--color-neon-mint);  stroke-width: 2.5; }
+.ln-gold  { stroke: var(--color-neon-gold);  stroke-width: 2.5; }
+.thin { stroke-width: 1.6; }
+.dim { opacity: 0.5; }
+.fill-pink  { fill: rgba(255, 122, 184, 0.07); }
+.fill-lilac { fill: rgba(169, 155, 255, 0.1); }
+.fill-gold  { fill: rgba(255, 217, 138, 0.1); }
+.fill-mint  { fill: rgba(125, 255, 208, 0.1); }
+
+.neon {
+  color: var(--color-neon-pink);
+  text-shadow: var(--glow-pink);
+}
+/* Unlit until it scrolls into view, then flickers on like a sign being plugged in */
+.js .neon:not(.is-lit) { opacity: 0.28; text-shadow: none; }
+.neon.is-lit { animation: neonOn 1.3s linear both; }
+.scene .neon.is-lit { animation-delay: 0.5s; } /* wait for the title to rise first */
+@keyframes neonOn {
+  0%       { opacity: 0.28; text-shadow: none; }
+  8%       { opacity: 1;    text-shadow: var(--glow-pink); }
+  12%      { opacity: 0.3;  text-shadow: none; }
+  20%      { opacity: 1;    text-shadow: var(--glow-pink); }
+  24%, 40% { opacity: 0.35; text-shadow: none; }
+  44%      { opacity: 1;    text-shadow: var(--glow-pink); }
+  100%     { opacity: 1;    text-shadow: var(--glow-pink); }
+}
+
+/* ---------- STAGE 1: gift ---------- */
+.order {
+  position: relative;
+  z-index: 2;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--space-page) var(--space-8);
+  text-align: center;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease), transform var(--motion-duration-fast) var(--motion-ease);
+  animation: rise var(--motion-duration-normal) var(--motion-ease) backwards;
+}
+.order.is-leaving {
+  opacity: 0;
+  transform: scale(0.96);
+  pointer-events: none;
+}
+
+.order__header {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: center;
+}
+.order__logo {
+  display: block;
+  width: min(220px, 56vw);
+  height: auto;
+  margin-bottom: var(--space-4);
+  /* soft neon halo: white for the wordmark, gold for the mark */
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.28)) drop-shadow(0 0 18px rgba(255, 217, 138, 0.3));
+}
+.order__title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-base);
+  line-height: 1.15;
+  text-wrap: balance;
+  text-shadow: var(--glow-text);
+}
+.order__kicker {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+}
+
+.gift {
+  width: min(260px, 34vh, 70vw);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.gift__svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 8px rgba(255, 150, 200, 0.85)) drop-shadow(0 0 30px rgba(255, 122, 184, 0.4));
+  animation: float 4.6s ease-in-out infinite;
+  transition: transform var(--motion-duration-instant) var(--motion-ease);
+}
+.gift:hover .gift__svg { transform: scale(1.05) rotate(-2deg); }
+.gift:active .gift__svg { transform: scale(0.97); }
+.gift__floor { fill: rgba(255, 122, 184, 0.12); stroke: none; }
+.gift__lid {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  transition: transform var(--motion-duration-fast) var(--motion-ease);
+}
+.gift:hover .gift__lid { transform: translateY(-4px) rotate(-3deg); }
+.gift__stars { animation: twinkle 2.4s ease-in-out infinite; }
+
+/* Every few seconds the box rattles, the lid lifts a crack and light leaks out */
+.gift__box {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: peekShake 4.2s ease-in-out 1.5s infinite;
+}
+.gift__lid { animation: peekLid 4.2s ease-in-out 1.5s infinite; }
+.gift__rays { opacity: 0; animation: peekRays 4.2s ease-in-out 1.5s infinite; }
+
+.gift.is-open .gift__box,
+.gift.is-open .gift__lid { animation: none; }
+.gift.is-open .gift__rays { animation: none; opacity: 1; }
+.gift.is-open .gift__lid { transform: translate(-6px, -46px) rotate(-24deg); }
+.gift.is-open .gift__svg { animation: giftOut var(--motion-duration-normal) var(--motion-ease) forwards; }
+
+@keyframes peekShake {
+  0%, 72%, 92%, 100% { rotate: 0deg; }
+  76% { rotate: -4deg; }
+  80% { rotate: 3.5deg; }
+  84% { rotate: -2.5deg; }
+  88% { rotate: 1.5deg; }
+}
+@keyframes peekLid  { 0%, 72%, 96%, 100% { translate: 0 0; } 78%, 90% { translate: 0 -5px; } }
+@keyframes peekRays { 0%, 72%, 96%, 100% { opacity: 0; } 78%, 90% { opacity: 1; } }
+
+/* ---------- Buttons (primary, outlined neon) ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 48px;
+  padding: var(--space-5) calc(var(--space-8) * 1.5);
+  border-radius: var(--radius-sm);
+  border: 1.5px solid rgba(255, 122, 184, 0.5);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: var(--shadow-2);
+  text-shadow: var(--glow-text);
+  transition: transform var(--motion-duration-instant) var(--motion-ease), box-shadow var(--motion-duration-instant), background var(--motion-duration-instant);
+}
+.btn i { font-size: 20px; color: var(--color-neon-pink); }
+.btn:hover {
+  background: rgba(255, 122, 184, 0.1);
+  transform: translateY(-1px);
+}
+.btn:active { transform: translateY(1px) scale(0.98); }
+.btn:focus-visible { outline: none; box-shadow: var(--focus-ring), var(--shadow-2); }
+.btn:disabled,
+.btn[aria-busy="true"] {
+  cursor: progress;
+  opacity: 0.6;
+  box-shadow: var(--shadow-1);
+  transform: none;
+}
+
+.order__note {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* ---------- STAGE 2: scene ---------- */
+.scene {
+  position: relative;
+  z-index: 2;
+  min-height: 100dvh;
+  max-width: 1360px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 420px) 1fr;
+  align-items: center;
+  column-gap: var(--space-page);
+  padding: var(--space-page) var(--space-8) calc(var(--space-page) * 2);
+}
+
+/* Center: bouquet + titles */
+.scene__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.bouquet {
+  width: min(300px, 40vh, 72vw);
+  aspect-ratio: 300 / 340;
+  margin-bottom: var(--space-4);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  position: relative;
+}
+/* Glow that breathes with the music; --beat (0..1) is set by script.js */
+.bouquet::before {
+  content: "";
+  position: absolute;
+  inset: 0 -12% 8%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 122, 184, 0.32), rgba(169, 155, 255, 0.12) 60%, transparent);
+  opacity: var(--beat, 0);
+  transform: scale(calc(0.85 + var(--beat, 0) * 0.3));
+  pointer-events: none;
+}
+.bouquet:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Hold to charge (--charge 0..1 from script.js), release to bloom */
+.bouquet {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.bouquet.is-charging::before { opacity: max(var(--beat, 0), var(--charge, 0)); }
+.bouquet.is-charging .bouquet__svg {
+  transform: scale(calc(1 + var(--charge, 0) * 0.07));
+  animation: jitter 90ms linear infinite;
+}
+@keyframes jitter {
+  0%, 100% { translate: 0 0; }
+  25% { translate: calc(var(--charge, 0) * 2px) 0; }
+  50% { translate: 0 calc(var(--charge, 0) * -2px); }
+  75% { translate: calc(var(--charge, 0) * -2px) 0; }
+}
+/* Same bloom as the entrance (unchanged, so it keeps its finished state) plus a spin on top */
+.scene.is-in .bouquet.is-bloom .fl {
+  animation: bloom 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.25) forwards, spinBloom 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-delay: var(--d), 0s;
+}
+@keyframes spinBloom { from { rotate: 0deg; scale: 1.4; } to { rotate: 360deg; scale: 1; } }
+.bouquet__svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 8px rgba(255, 150, 200, 0.85)) drop-shadow(0 0 32px rgba(255, 122, 184, 0.4));
+  transition: transform var(--motion-duration-instant) var(--motion-ease);
+}
+.bouquet:hover .bouquet__svg { transform: scale(1.03); }
+.bouquet:active .bouquet__svg { transform: scale(0.98); }
+.bouquet__sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sway 4.6s ease-in-out infinite;
+}
+
+.stem { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.leaf { opacity: 0; fill: rgba(125, 255, 208, 0.12); }
+.fl { transform-box: fill-box; transform-origin: center; scale: 0; }
+.scene.is-in .stem { animation: draw var(--motion-duration-normal) ease-out forwards; animation-delay: var(--d); }
+.scene.is-in .leaf { animation: fadeIn var(--motion-duration-fast) ease-out forwards; animation-delay: var(--d); }
+.scene.is-in .fl { animation: bloom 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.25) forwards; animation-delay: var(--d); }
+
+.scene__eyebrow {
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.3em;
+  text-wrap: balance;
+  color: var(--color-text-secondary);
+}
+.scene__title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-base);
+  line-height: 1.1;
+}
+.scene__to {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text-primary);
+  text-shadow: var(--glow-text);
+}
+/* Side texts flank the bouquet on desktop */
+.scene__center { grid-column: 2; grid-row: 1; }
+.scene__side { grid-row: 1; max-width: 30ch; }
+.scene__side--left { grid-column: 1; justify-self: end; text-align: right; }
+.scene__side--right { grid-column: 3; justify-self: start; }
+@media (min-width: 901px) {
+  /* keep clear of the story rail on the right */
+  .scene { padding-right: calc(var(--space-page) * 1.5); }
+}
+@media (max-width: 1200px) {
+  .story .story__dot.is-active span { opacity: 0; }
+  .story .story__dot:hover span, .story .story__dot:focus-visible span { opacity: 1; }
+}
+
+/* BD team photos: a small pile of polaroids; the top one slides off and tucks under (script.js sets data-pos) */
+.team-stack {
+  --w: min(230px, 62vw);
+  position: relative;
+  display: block;
+  width: var(--w);
+  height: calc(var(--w) * 0.75 + 44px);
+  margin: 0 0 var(--space-section) auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.team-stack:focus-visible { outline: none; }
+.team-stack:focus-visible .team-stack__card[data-pos="0"] { box-shadow: var(--focus-ring), var(--shadow-2); }
+.team-stack__card {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 8px 8px 0;
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  background: #050108;
+  box-shadow: var(--shadow-2), 0 10px 24px rgba(0, 0, 0, 0.6);
+  transition: transform 520ms var(--motion-ease), opacity 520ms var(--motion-ease);
+}
+.team-stack__card:nth-child(even) { border-color: var(--color-neon-lilac); box-shadow: var(--shadow-3), 0 10px 24px rgba(0, 0, 0, 0.6); }
+.team-stack__card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius-xs);
+}
+.team-stack__caption {
+  display: block;
+  padding: 4px 0 6px;
+  text-align: center;
+  font-family: var(--font-family-script);
+  font-size: 20px;
+  letter-spacing: 0;
+  color: var(--color-neon-pink);
+  text-shadow: 0 0 8px rgba(255, 122, 184, 0.6);
+}
+.team-stack__card:nth-child(even) .team-stack__caption { color: var(--color-neon-lilac); text-shadow: 0 0 8px rgba(169, 155, 255, 0.6); }
+.team-stack__card[data-pos="0"] { z-index: 4; transform: rotate(-3deg); }
+.team-stack__card[data-pos="1"] { z-index: 3; transform: translate(12px, 4px) rotate(4deg); }
+.team-stack__card[data-pos="2"] { z-index: 2; transform: translate(-10px, 7px) rotate(-8deg); opacity: 0.9; }
+.team-stack__card[data-pos="3"] { z-index: 1; transform: translate(6px, 10px) rotate(9deg); opacity: 0.8; }
+.team-stack:hover .team-stack__card[data-pos="0"] { transform: rotate(-1deg) scale(1.03); }
+/* the top photo slides off to the side before it tucks under the pile */
+.team-stack__card.is-out { transform: translate(-115%, -14px) rotate(-20deg) !important; opacity: 0 !important; }
+
+.scene__lead {
+  font-size: var(--font-size-2xl);
+  line-height: 1.7;
+  color: var(--color-text-primary);
+  text-shadow: var(--glow-text);
+  text-wrap: balance;
+}
+.scene__lead strong { font-weight: var(--font-weight-base); color: var(--color-neon-pink); text-shadow: var(--glow-pink); }
+
+/* ---------- Four flowers, four wishes: neon cards that light up their flowers in the bouquet ---------- */
+.scene__desc {
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
+  letter-spacing: 0.16em;
+  text-transform: lowercase;
+  text-wrap: balance;
+  color: var(--color-text-tertiary);
+}
+.scene__desc::after { /* a short neon rule under the label */
+  content: "";
+  display: block;
+  width: 72px;
+  height: 1px;
+  margin-top: var(--space-4);
+  background: linear-gradient(90deg, var(--color-neon-pink), transparent);
+  box-shadow: 0 0 6px var(--color-neon-pink);
+}
+.meanings {
+  list-style: none;
+  width: min(270px, 100%);
+  margin: var(--space-7) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+.meaning {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+  padding: var(--space-4) var(--space-6) var(--space-4) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--flower) 35%, transparent);
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--flower) 14%, transparent), rgba(5, 1, 8, 0.6) 70%);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--flower) 18%, transparent), inset 0 0 10px color-mix(in srgb, var(--flower) 10%, transparent);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--motion-duration-instant) var(--motion-ease), border-color var(--motion-duration-instant), box-shadow var(--motion-duration-instant);
+}
+.meaning:hover,
+.meaning:focus-visible,
+.meaning[aria-pressed="true"] {
+  transform: translateX(4px);
+  border-color: var(--flower);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--flower) 45%, transparent), inset 0 0 14px color-mix(in srgb, var(--flower) 22%, transparent);
+  outline: none;
+}
+.meaning:focus-visible { box-shadow: var(--focus-ring), 0 0 18px color-mix(in srgb, var(--flower) 45%, transparent); }
+.meaning__badge {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--flower) 60%, transparent);
+  background: radial-gradient(circle, color-mix(in srgb, var(--flower) 22%, transparent), transparent 70%);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--flower) 40%, transparent);
+}
+.meaning__flower {
+  width: 30px;
+  height: 30px;
+  overflow: visible;
+  fill: color-mix(in srgb, var(--flower) 14%, transparent);
+  stroke: var(--flower);
+  stroke-width: 2.4;
+  filter: drop-shadow(0 0 6px var(--flower));
+  animation: meaningSpin 14s linear infinite;
+}
+.meaning:hover .meaning__flower,
+.meaning[aria-pressed="true"] .meaning__flower { animation-duration: 3s; }
+@keyframes meaningSpin { to { rotate: 360deg; } }
+.meaning__text { display: grid; gap: 2px; min-width: 0; }
+.meaning__name {
+  font-size: var(--font-size-xl);
+  color: var(--flower);
+  text-shadow: 0 0 12px var(--flower);
+  white-space: nowrap;
+}
+.meaning__from {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+}
+.meaning__from:empty { display: none; }
+
+/* Focus one wish: its flowers in the bouquet brighten, the other colours fade back */
+.bouquet__svg g[class*="fill-"] { transition: opacity 300ms ease, filter 300ms ease; }
+.bouquet[data-focus] .bouquet__svg g[class*="fill-"] { opacity: 0.22; }
+.bouquet[data-focus="pink"] .bouquet__svg g.fill-pink,
+.bouquet[data-focus="gold"] .bouquet__svg g.fill-gold,
+.bouquet[data-focus="lilac"] .bouquet__svg g.fill-lilac,
+.bouquet[data-focus="mint"] .bouquet__svg g.fill-mint { opacity: 1; filter: brightness(1.4); }
+
+/* "Hold the bouquet" hint, right under it */
+.scene__hint {
+  margin: calc(var(--space-4) * -1) 0 var(--space-6);
+  text-wrap: balance;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+.scene__hint i {
+  display: inline-block;
+  font-size: 18px;
+  vertical-align: -3px;
+  margin-right: var(--space-1);
+  color: var(--color-neon-pink);
+  text-shadow: var(--glow-pink);
+  animation: hintPress 1.8s ease-in-out infinite;
+}
+/* the hand presses down and holds, like the gesture it describes */
+@keyframes hintPress {
+  0%, 100% { translate: 0 0; scale: 1; }
+  30%, 70% { translate: 0 3px; scale: 0.9; }
+}
+.hint--mouse { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .hint--mouse { display: inline; }
+  .hint--touch { display: none; }
+}
+
+/* Fixed bottom pills */
+.pill {
+  position: fixed;
+  bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 44px;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 122, 184, 0.5);
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+  transition: transform var(--motion-duration-instant) var(--motion-ease), box-shadow var(--motion-duration-instant);
+}
+.pill--left { left: max(var(--space-8), env(safe-area-inset-left)); }
+.pill--right { right: max(var(--space-8), env(safe-area-inset-right)); }
+.pill i { font-size: 18px; color: var(--color-neon-pink); }
+.pill:hover { box-shadow: var(--shadow-2); transform: translateY(-1px); }
+.pill:active { transform: translateY(1px) scale(0.97); }
+.pill:focus-visible { outline: none; box-shadow: var(--focus-ring), var(--shadow-2); }
+.pill:disabled { cursor: not-allowed; opacity: 0.6; box-shadow: none; transform: none; }
+
+.music[data-state="loading"] { cursor: progress; }
+.music[data-state="error"] { border-color: var(--color-text-tertiary); }
+.music__bars {
+  display: none;
+  align-items: flex-end;
+  gap: 2.5px;
+  width: 18px;
+  height: 15px;
+}
+.music__bars i {
+  display: block;
+  width: 2.5px;
+  height: 100%;
+  background: var(--color-neon-pink);
+  box-shadow: 0 0 6px var(--color-neon-pink);
+  border-radius: 2px;
+  transform-origin: bottom;
+  animation: eq 900ms ease-in-out infinite alternate;
+}
+.music__bars i:nth-child(2) { animation-delay: -300ms; }
+.music__bars i:nth-child(3) { animation-delay: -600ms; }
+.music__bars i:nth-child(4) { animation-delay: -150ms; }
+/* With the analyser running, script.js sets each bar from the real frequency bands */
+.music.is-live .music__bars i { animation: none; transform: scaleY(0.2); transition: transform 90ms linear; }
+.music[data-state="playing"] .music__bars { display: inline-flex; }
+.music[data-state="playing"] .music__icon { display: none; }
+
+/* ---------- Entrance choreography (animation with backwards fill,
+   so the stagger never leaks into hover transitions) ---------- */
+.scene.is-in .pop {
+  animation: rise var(--motion-duration-normal) var(--motion-ease) backwards;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+
+@keyframes rise { from { opacity: 0; translate: 0 14px; scale: 0.96; } }
+@keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -9px; } }
+@keyframes sway { 0%, 100% { rotate: -1.2deg; } 50% { rotate: 1.2deg; } }
+@keyframes twinkle { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes fadeIn { to { opacity: 1; } }
+@keyframes bloom { from { scale: 0; rotate: -40deg; } to { scale: 1; rotate: 0deg; } }
+@keyframes giftOut {
+  0% { scale: 1; }
+  40% { scale: 1.12; }
+  100% { scale: 1.3; opacity: 0; translate: 0 -30px; }
+}
+@keyframes eq { from { transform: scaleY(0.25); } to { transform: scaleY(1); } }
+
+/* =========================================================
+   Lá thư team Hệ thống
+   Scroll-driven where supported (animation-timeline), class-based
+   fallback (IntersectionObserver adds .is-torn / .is-out / .is-visible).
+   ========================================================= */
+html { scroll-behavior: smooth; }
+
+.btn--letter {
+  margin-top: var(--space-6);
+  text-decoration: none;
+  font-size: var(--font-size-lg);
+}
+
+.letter {
+  position: relative;
+  z-index: 2;
+}
+
+/* Tall track: the sticky stage stays pinned while the track scrolls past */
+.letter__track {
+  position: relative;
+  height: 280vh;
+  view-timeline-name: --envelope;
+}
+.letter__mark { position: absolute; left: 0; width: 1px; height: 1px; }
+
+.letter__sticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-section);
+  padding: var(--space-page) var(--space-8);
+  overflow: hidden;
+}
+
+.letter__title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-base);
+  line-height: 1.1;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: var(--glow-text);
+}
+
+.letter__hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.18em;
+}
+
+/* ---------- Envelope (16:10) ---------- */
+.envelope {
+  position: relative;
+  width: min(440px, 86vw);
+  aspect-ratio: 400 / 250;
+  margin-top: calc(var(--space-page) * 3); /* room for the paper to rise */
+  filter: drop-shadow(0 0 8px rgba(255, 150, 200, 0.55)) drop-shadow(0 0 28px rgba(255, 122, 184, 0.25));
+}
+
+.env__back {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 122, 184, 0.4);
+  border-radius: var(--radius-xs);
+  background: #07020d;
+}
+
+.paper {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 8%;
+  height: 88%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-7) var(--space-8);
+  border: 1.5px solid rgba(255, 122, 184, 0.5);
+  border-radius: var(--radius-sm);
+  background:
+    repeating-linear-gradient(180deg, transparent 0 25px, rgba(255, 122, 184, 0.09) 25px 26px),
+    #050108;
+  box-shadow: var(--shadow-1);
+}
+.paper__greet {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  text-shadow: var(--glow-text);
+}
+.paper__text {
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
+  color: var(--color-text-tertiary);
+}
+.paper__team { display: flex; gap: var(--space-2); margin-top: auto; }
+.paper__team span {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 11px;
+  color: var(--color-neon-pink);
+}
+.paper__team span:nth-child(even) { color: var(--color-neon-lilac); }
+
+.env__front {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.env__pocket { fill: var(--color-surface-base); stroke: var(--color-neon-pink); stroke-width: 2; }
+.env__fold { stroke: var(--color-neon-lilac); stroke-width: 1.5; opacity: 0.8; }
+
+.env__strip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  aspect-ratio: 400 / 64;
+  transform-origin: 0% 100%;
+}
+.env__strip svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.env__band { fill: var(--color-surface-base); stroke: var(--color-neon-pink); stroke-width: 2; }
+.env__flap { stroke: var(--color-neon-lilac); stroke-width: 1.5; opacity: 0.8; }
+.env__seal {
+  position: absolute;
+  left: 50%;
+  top: 72%;
+  width: 60px;
+  height: 60px;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--color-neon-gold);
+  background: var(--color-surface-base);
+  box-shadow: 0 0 14px rgba(255, 217, 138, 0.45), inset 0 0 10px rgba(255, 217, 138, 0.2);
+}
+.env__seal img {
+  width: 42px;
+  height: auto;
+  filter: drop-shadow(0 0 4px rgba(255, 217, 138, 0.7));
+}
+
+/* ---------- Chapter headings (shared) ---------- */
+.chapter__title {
+  margin: 0 0 var(--space-page);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-base);
+  line-height: 1.1;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: var(--glow-text);
+}
+
+/* ---------- Chapter 3: four flowers, four wishes (sticky stack) ---------- */
+.wishes-team {
+  position: relative;
+  z-index: 2;
+  padding: var(--space-page) var(--space-8) 0;
+}
+.notes {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 45vh;
+  padding-bottom: 35vh;
+}
+
+/* Each page pins a little lower than the one before, so they pile up like letters.
+   .note carries pinning + scroll entrance; .note__card carries the paper and the 3D tilt. */
+.note {
+  position: sticky;
+  top: calc(12vh + var(--i, 0) * 28px);
+  width: 100%;
+  rotate: var(--tilt, 0deg);
+}
+.note__card {
+  position: relative;
+  padding: var(--space-section) var(--space-section) var(--space-8);
+  border: 1px solid rgba(255, 122, 184, 0.55);
+  border-radius: var(--radius-md);
+  background:
+    repeating-linear-gradient(180deg, transparent 0 30px, rgba(255, 122, 184, 0.07) 30px 31px),
+    #050108;
+  box-shadow: var(--shadow-2), 0 -18px 40px rgba(0, 0, 0, 0.7);
+  /* --rx/--ry/--gx/--gy are set on #notes by script.js (mouse or gyroscope) */
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 500ms var(--motion-ease);
+}
+/* Soft sheen that slides across the paper as it tilts */
+.note__card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255, 255, 255, 0.07), transparent 55%);
+  pointer-events: none;
+}
+.note--lilac .note__card { border-color: rgba(169, 155, 255, 0.6); box-shadow: var(--shadow-3), 0 -18px 40px rgba(0, 0, 0, 0.7); }
+.note:nth-child(odd) { --tilt: -1.2deg; }
+.note:nth-child(even) { --tilt: 1.4deg; }
+
+.note__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+.note__avatar {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: var(--font-size-lg);
+  color: var(--color-neon-pink);
+  text-shadow: var(--glow-pink);
+  box-shadow: 0 0 14px rgba(255, 122, 184, 0.4), inset 0 0 10px rgba(255, 122, 184, 0.2);
+}
+/* Photo avatars: the neon ring stays, the photo sits just inside it */
+.note__avatar.has-photo,
+.paper__team span.has-photo { padding: 2px; overflow: hidden; }
+.note__avatar.has-photo { width: 64px; height: 64px; }
+.note__avatar img,
+.paper__team img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.note--lilac .note__avatar {
+  color: var(--color-neon-lilac);
+  text-shadow: 0 0 12px var(--color-neon-lilac);
+  box-shadow: 0 0 14px rgba(169, 155, 255, 0.4), inset 0 0 10px rgba(169, 155, 255, 0.2);
+}
+.note__name {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-base);
+  color: var(--color-text-primary);
+  text-shadow: var(--glow-text);
+}
+.note__role { font-size: var(--font-size-xs); color: var(--color-text-tertiary); margin-top: var(--space-1); }
+
+/* The flower this person hands over */
+.note__gift {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-7);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+.note__gift strong {
+  font-weight: var(--font-weight-base);
+  font-size: var(--font-size-xl);
+  color: var(--flower);
+  text-shadow: 0 0 12px var(--flower);
+}
+.note__flower {
+  width: 34px;
+  height: 34px;
+  overflow: visible;
+  fill: color-mix(in srgb, var(--flower) 12%, transparent);
+  stroke: var(--flower);
+  stroke-width: 2.4;
+  filter: drop-shadow(0 0 6px var(--flower));
+  opacity: 0.25;
+  scale: 0.7;
+  transition: opacity var(--motion-duration-instant), scale var(--motion-duration-instant);
+}
+/* The flower flown in from the bouquet lands here */
+.note.is-received .note__flower { opacity: 1; scale: 1; animation: receive 600ms var(--motion-ease); }
+@keyframes receive { 0% { scale: 0.6; } 45% { scale: 1.4; } 100% { scale: 1; } }
+[data-flower="pink"]  { --flower: var(--color-neon-pink); }
+[data-flower="gold"]  { --flower: var(--color-neon-gold); }
+[data-flower="lilac"] { --flower: var(--color-neon-lilac); }
+[data-flower="mint"]  { --flower: var(--color-neon-mint); }
+
+.note__wish {
+  white-space: pre-line;
+  font-size: var(--font-size-lg);
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+}
+/* Typewriter: the caret is an empty inline border so it never adds a wrap point mid-word */
+.wish__ghost { color: transparent; }
+.wish__caret { display: none; }
+.note.is-typing .wish__caret {
+  display: inline;
+  margin-right: -2px;
+  border-left: 2px solid var(--flower);
+  box-shadow: 0 0 8px var(--flower);
+  animation: caret 0.9s steps(1) infinite;
+}
+@keyframes caret { 50% { opacity: 0; } }
+
+/* Handwritten signature, drawn in neon once the wish is typed */
+.note__sign {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  color: var(--flower);
+}
+.sign__svg { flex: 1; min-width: 0; height: 52px; overflow: visible; }
+.sign__svg text {
+  font-family: var(--font-family-script);
+  font-size: 36px;
+  letter-spacing: 0;
+  fill: transparent;
+  stroke: var(--flower);
+  stroke-width: 1.1;
+  stroke-dasharray: 260;
+  stroke-dashoffset: 260;
+  filter: drop-shadow(0 0 4px var(--flower));
+}
+.note.is-signed .sign__svg text { animation: sign 2.4s ease-out forwards; }
+@keyframes sign {
+  65%  { stroke-dashoffset: 0; fill: transparent; }
+  100% { stroke-dashoffset: 0; fill: color-mix(in srgb, var(--flower) 85%, transparent); }
+}
+.note__sign i {
+  display: inline-block;
+  font-size: 22px;
+  text-shadow: 0 0 10px var(--flower);
+  opacity: 0;
+  scale: 0.4;
+  transition: opacity 400ms ease 1.6s, scale 500ms cubic-bezier(0.2, 0.9, 0.3, 1.5) 1.6s;
+}
+.note.is-signed .note__sign i { opacity: 1; scale: 1; }
+
+/* ---------- Chapter 4: group photos (two polaroids develop on scroll) ---------- */
+.photo { position: relative; z-index: 2; }
+/* Fly-in start positions sit off-screen; clip them so phones never zoom out.
+   overflow: clip (not hidden) keeps position: sticky working. */
+.scene, .letter, .wishes-team, .photo { overflow-x: clip; }
+.photo__track {
+  position: relative;
+  height: 300vh;
+  view-timeline-name: --photo;
+}
+.photo__mark { position: absolute; left: 0; width: 1px; height: 1px; }
+.photo__sticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-section);
+  padding: var(--space-page) var(--space-8);
+  overflow: hidden;
+}
+.photo__title { margin: 0; }
+
+.polaroids {
+  /* height budget: title, thank-you line, signature line and gaps take ~450px */
+  --pw: min(340px, 32vw, calc((100dvh - 350px) * 0.75));
+  display: grid;
+  grid-template-columns: repeat(2, var(--pw));
+  gap: var(--space-section);
+}
+.polaroid {
+  margin: 0;
+  width: var(--pw);
+  padding: 12px;
+  border: 2px solid rgba(255, 122, 184, 0.55);
+  border-radius: var(--radius-md);
+  background: #08030d;
+  box-shadow: var(--shadow-2), 0 0 20px rgba(255, 122, 184, 0.25);
+}
+.polaroid--1 { rotate: -2deg; border-color: rgba(255, 122, 184, 0.7); box-shadow: var(--shadow-2), 0 0 22px rgba(255, 122, 184, 0.3); }
+.polaroid--2 { rotate: 2deg; border-color: rgba(169, 155, 255, 0.7); box-shadow: var(--shadow-3), 0 0 22px rgba(169, 155, 255, 0.3); }
+.polaroid__img {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: calc(var(--radius-md) - 6px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #000;
+}
+.polaroid__img img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+
+/* Camera flash on just this photo (pseudo-elements, so the polaroid's own
+   scroll-driven entrance animation is left untouched) */
+.polaroid { position: relative; }
+.polaroid__img { position: relative; }
+.polaroid__img::after,
+.polaroid::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+.polaroid__img::after {
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, #fff 0%, rgba(255, 245, 250, 0.9) 55%, rgba(255, 225, 240, 0.75) 100%);
+}
+.polaroid::after {
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px #fff, 0 0 28px 6px rgba(255, 255, 255, 0.8), 0 0 60px 12px rgba(255, 200, 230, 0.5);
+}
+.polaroid.is-flash .polaroid__img::after,
+.polaroid.is-flash::after { animation: cameraFlash 650ms ease-out; }
+@keyframes cameraFlash { 0% { opacity: 0; } 8% { opacity: 0.9; } 100% { opacity: 0; } }
+.polaroid__caption {
+  padding: var(--space-7) var(--space-4) var(--space-8);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+.photo__thanks {
+  max-width: 72ch;
+  font-size: var(--font-size-lg);
+  line-height: 1.7;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-text-secondary);
+  text-shadow: 0 0 6px var(--color-surface-base), 0 0 14px var(--color-surface-base); /* stays legible over the neon grass */
+}
+/* The thank-you line sits right above the signature, so the gap between them is tighter */
+.photo__thanks + .photo__end { margin-top: calc(var(--space-8) - var(--space-section)); }
+.photo__end {
+  font-size: var(--font-size-2xl);
+  text-align: center;
+  text-wrap: balance;
+  /* dark halo first: this line sits right in front of the rising sun */
+  text-shadow: 0 0 6px var(--color-surface-base), 0 0 14px var(--color-surface-base), var(--glow-text);
+}
+.photo__end .neon.is-lit { text-shadow: 0 0 6px var(--color-surface-base), 0 0 14px var(--color-surface-base), var(--glow-pink); }
+
+/* ---------- Chapter 5: the LightHuman constellation (drawn on the canvas over .finale__sky) ---------- */
+.finale {
+  position: relative;
+  z-index: 2;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-section);
+  padding: var(--space-page) var(--space-8) calc(var(--space-page) * 2);
+  text-align: center;
+}
+.finale .chapter__title { margin: 0; }
+.finale__sky {
+  width: min(560px, 86vw);
+  aspect-ratio: 155 / 91;
+}
+/* The real mark glows in faintly behind the stars once they are all joined */
+.finale__sky img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  /* the source mark is small; a light blur turns its pixels into a soft glow */
+  filter: blur(2px) drop-shadow(0 0 18px rgba(255, 217, 138, 0.6));
+  transition: opacity 1.6s ease;
+}
+.finale.is-done .finale__sky img { opacity: 0.22; }
+.finale__text {
+  max-width: 40ch;
+  font-size: var(--font-size-xl);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  text-wrap: balance;
+  text-shadow: var(--glow-text);
+  opacity: 0;
+  translate: 0 12px;
+  transition: opacity var(--motion-duration-normal) var(--motion-ease) 0.4s, translate var(--motion-duration-normal) var(--motion-ease) 0.4s;
+}
+.finale.is-done .finale__text { opacity: 1; translate: 0 0; }
+
+/* ---------- Story progress: right rail (desktop), top bar (mobile) ---------- */
+.story {
+  position: fixed;
+  right: max(var(--space-8), env(safe-area-inset-right));
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 10;
+}
+.story__line {
+  position: absolute;
+  right: 5px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: rgba(255, 122, 184, 0.25);
+}
+.story__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-neon-pink);
+  box-shadow: 0 0 8px var(--color-neon-pink);
+  transform-origin: 50% 0%;
+  transform: scaleY(var(--story, 0));
+  transition: transform var(--motion-duration-fast) var(--motion-ease);
+}
+.story__list {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-section) * 1.5);
+}
+.story__dot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  min-height: 24px;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+  text-decoration: none;
+}
+.story__dot::after {
+  content: "";
+  flex: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid var(--color-neon-pink);
+  background: var(--color-surface-base);
+  box-shadow: var(--shadow-1);
+  transition: background var(--motion-duration-instant), box-shadow var(--motion-duration-instant);
+}
+.story__dot span {
+  opacity: 0;
+  translate: 6px 0;
+  transition: opacity var(--motion-duration-instant), translate var(--motion-duration-instant);
+}
+.story__dot:hover span,
+.story__dot:focus-visible span,
+.story__dot.is-active span { opacity: 1; translate: 0 0; }
+.story__dot.is-active::after { background: var(--color-neon-pink); box-shadow: 0 0 10px var(--color-neon-pink), 0 0 20px var(--color-neon-pink); }
+.story__dot:hover::after { box-shadow: var(--shadow-2); }
+.story__dot:focus-visible { outline: none; }
+.story__dot:focus-visible::after { box-shadow: var(--focus-ring); }
+
+/* ---------- Motion ---------- */
+@keyframes tearOff {
+  0%   { transform: none; opacity: 1; }
+  25%  { transform: translate(1%, -6%) rotate(-3deg); }
+  100% { transform: translate(38%, -260%) rotate(-28deg); opacity: 0; }
+}
+@keyframes paperOut { to { transform: translateY(-74%); } }
+@keyframes envSink  { to { transform: translateY(12%) scale(0.96); opacity: 0.35; } }
+@keyframes hintOut  { to { opacity: 0; } }
+@keyframes noteIn   { from { opacity: 0; transform: translateY(80px) rotate(var(--tilt-in, -5deg)); } }
+@keyframes polaroidIn  { from { opacity: 0; transform: translate(-30%, 90px) rotate(-12deg) scale(0.85); } }
+@keyframes polaroidIn2 { from { opacity: 0; transform: translate(60%, 60px) rotate(16deg) scale(0.85); } }
+@keyframes develop  { from { filter: blur(12px) grayscale(1) brightness(0.3); } }
+@keyframes fadeUp   { from { opacity: 0; transform: translateY(20px); } }
+@keyframes storyY   { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes storyX   { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .env__strip, .paper, .envelope, .letter__hint {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --envelope;
+    }
+    .letter__hint { animation-name: hintOut;  animation-range: contain 0% contain 6%; }
+    .env__strip   { animation-name: tearOff;  animation-range: contain 4% contain 32%; }
+    .paper        { animation-name: paperOut; animation-range: contain 28% contain 68%; }
+    .envelope     { animation-name: envSink;  animation-range: contain 74% contain 100%; }
+
+    .note {
+      animation: noteIn linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+    .note:nth-child(even) { --tilt-in: 5deg; }
+
+    .polaroid, .polaroid__img img, .photo__title, .photo__thanks, .photo__end {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --photo;
+    }
+    .photo__thanks { animation-name: fadeUp; animation-range: contain 68% contain 84%; }
+    .photo__title { animation-name: fadeUp; animation-range: contain 0% contain 12%; }
+    /* Photo 1 lands and develops, then photo 2 flies in beside it */
+    .polaroid--1 { animation-name: polaroidIn;  animation-range: contain 0% contain 28%; }
+    .polaroid--1 .polaroid__img img { animation-name: develop; animation-range: contain 12% contain 42%; }
+    .polaroid--2 { animation-name: polaroidIn2; animation-range: contain 36% contain 62%; }
+    .polaroid--2 .polaroid__img img { animation-name: develop; animation-range: contain 46% contain 76%; }
+    .photo__end { animation-name: fadeUp; animation-range: contain 74% contain 90%; }
+
+    /* Phones: photos stack, so each one reveals as it enters view */
+    @media (max-width: 640px) {
+      .polaroid, .polaroid__img img, .photo__title, .photo__thanks, .photo__end { animation-timeline: view(); }
+      .photo__title, .photo__thanks { animation-range: entry 0% entry 100%; }
+      .polaroid--1, .polaroid--2 { animation-range: entry 0% cover 40%; }
+      .polaroid--1 .polaroid__img img,
+      .polaroid--2 .polaroid__img img { animation-range: entry 40% cover 50%; }
+      .photo__end { animation-range: entry 0% entry 100%; }
+    }
+  }
+
+  /* Fallback: discrete steps driven by IntersectionObserver classes */
+  @supports not (animation-timeline: view()) {
+    .env__strip { transition: transform var(--motion-duration-normal) var(--motion-ease), opacity var(--motion-duration-normal); }
+    .paper { transition: transform var(--motion-duration-normal) var(--motion-ease); }
+    .letter__hint { transition: opacity var(--motion-duration-fast); }
+    .letter.is-torn .letter__hint { opacity: 0; }
+    .letter.is-torn .env__strip { transform: translate(38%, -260%) rotate(-28deg); opacity: 0; }
+    .letter.is-out .paper { transform: translateY(-74%); }
+
+    .note { transition: opacity var(--motion-duration-normal) var(--motion-ease), transform var(--motion-duration-normal) var(--motion-ease); }
+    .note:not(.is-visible) { opacity: 0; transform: translateY(80px); }
+
+    .polaroid, .photo__thanks, .photo__end { transition: opacity var(--motion-duration-normal) var(--motion-ease), transform var(--motion-duration-normal) var(--motion-ease); }
+    .polaroid__img img { transition: filter 1.6s var(--motion-ease); }
+    .polaroid--2, .polaroid--2 .polaroid__img img { transition-delay: 0.5s; }
+    .photo__thanks { transition-delay: 0.8s; }
+    .photo__end { transition-delay: 1.1s; }
+    .photo:not(.is-in) .polaroid--1 { opacity: 0; transform: translate(-30%, 90px) rotate(-12deg) scale(0.85); }
+    .photo:not(.is-in) .polaroid--2 { opacity: 0; transform: translate(60%, 60px) rotate(16deg) scale(0.85); }
+    .photo:not(.is-in) .polaroid__img img { filter: blur(12px) grayscale(1) brightness(0.3); }
+    .photo:not(.is-in) .photo__thanks,
+    .photo:not(.is-in) .photo__end { opacity: 0; transform: translateY(20px); }
+  }
+}
+
+/* Story rail follows real scroll position where supported (not motion, it is a position readout) */
+@supports (animation-timeline: scroll()) {
+  .story__fill { transition: none; animation: storyY linear both; animation-timeline: scroll(root); }
+}
+
+/* Reduced motion: letter already open, photo developed, no pinning */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .letter__track, .photo__track { height: auto; }
+  .letter__sticky, .photo__sticky { position: relative; height: auto; overflow: visible; }
+  .letter__hint, .env__strip { display: none; }
+  .paper { transform: translateY(-74%); }
+  .wishes-team { padding-top: 0; }
+  .notes { gap: var(--space-section); padding-bottom: var(--space-page); }
+  .note { position: relative; top: auto; }
+  .story__fill { animation: none !important; }
+}
+
+@media (max-width: 900px) {
+  /* Story rail becomes a thin progress bar on top */
+  .story { top: 0; left: 0; right: 0; translate: none; height: 3px; }
+  .story__line { inset: 0; width: auto; height: 3px; background: rgba(255, 122, 184, 0.18); }
+  .story__fill { transform-origin: 0% 50%; transform: scaleX(var(--story, 0)); }
+  .story__list { display: none; }
+  @supports (animation-timeline: scroll()) {
+    .story__fill { animation-name: storyX; }
+  }
+}
+
+@media (max-width: 640px) {
+  .note { --tilt: 0deg !important; top: calc(10vh + var(--i, 0) * 18px); }
+  .note__card { padding: var(--space-8); }
+  .sign__svg { height: 46px; }
+  .sign__svg text { font-size: 32px; }
+  .note__wish { font-size: var(--font-size-md); line-height: 1.7; }
+  /* Phones: keep the opening line, drop the initials row to make room */
+  .paper { padding: var(--space-5) var(--space-6); }
+  .paper__text { font-size: 13px; line-height: 1.55; }
+  .paper__team { display: none; }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .scene__side { max-width: 36ch; text-align: center; }
+  .team-stack { margin-inline: auto; } /* centred once the sides stack under the bouquet */
+  .scene__desc::after { margin-inline: auto; background: linear-gradient(90deg, transparent, var(--color-neon-pink), transparent); }
+  .meanings { width: min(420px, 100%); margin-inline: auto; grid-template-columns: repeat(2, 1fr); }
+  .meaning { gap: var(--space-4); padding-right: var(--space-4); }
+  .meaning:hover, .meaning:focus-visible, .meaning[aria-pressed="true"] { transform: translateY(-2px); }
+  .meaning__badge { width: 36px; height: 36px; }
+  .meaning__flower { width: 24px; height: 24px; }
+  .meaning__name { font-size: var(--font-size-md); }
+  .scene {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    padding: var(--space-section) var(--space-8) calc(var(--space-page) * 2);
+  }
+}
+
+@media (max-width: 640px) {
+  .photo__track { height: auto; }
+  .photo__sticky { position: relative; height: auto; overflow: visible; padding-bottom: calc(var(--space-page) * 2); }
+  .polaroids { --pw: min(100%, 340px); grid-template-columns: var(--pw); justify-content: center; width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .order__title, .scene__title { line-height: 1.1; }
+  .scene__eyebrow { letter-spacing: 0.18em; }
+  .pill__label { display: none; }
+  .pill { padding: var(--space-4) var(--space-5); }
+}
+
+/* ---------- Reduced motion: loops off, reveals instant, art fully drawn ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .gift__svg, .bouquet__sway, .gift__stars, .gift__box, .gift__lid { animation: none !important; }
+  .gift__rays { animation: none !important; opacity: 0; }
+  .scene__hint { display: none; } /* hold-to-bloom is off with reduced motion */
+  .note__card { transform: none; }
+  .note__flower { opacity: 1; scale: 1; }
+  .sign__svg text { stroke-dashoffset: 0; fill: color-mix(in srgb, var(--flower) 85%, transparent); }
+  .note__sign i { opacity: 1; scale: 1; }
+  .js .neon:not(.is-lit) { opacity: 1; text-shadow: var(--glow-pink); }
+  .finale__sky img { opacity: 0.8; }
+  .finale__text { opacity: 1; translate: 0 0; }
+  .polaroid__img::after, .polaroid::after { display: none; }
+  .stem { stroke-dashoffset: 0; }
+  .leaf { opacity: 1; }
+  .fl { scale: 1; }
+}
