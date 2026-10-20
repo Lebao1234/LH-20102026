@@ -444,6 +444,60 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
   .story .story__dot:hover span, .story .story__dot:focus-visible span { opacity: 1; }
 }
 
+/* BD team photos: a small pile of polaroids; the top one slides off and tucks under (script.js sets data-pos) */
+.team-stack {
+  --w: min(230px, 62vw);
+  position: relative;
+  display: block;
+  width: var(--w);
+  height: calc(var(--w) * 0.75 + 44px);
+  margin: 0 0 var(--space-section) auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.team-stack:focus-visible { outline: none; }
+.team-stack:focus-visible .team-stack__card[data-pos="0"] { box-shadow: var(--focus-ring), var(--shadow-2); }
+.team-stack__card {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 8px 8px 0;
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--radius-sm);
+  background: #050108;
+  box-shadow: var(--shadow-2), 0 10px 24px rgba(0, 0, 0, 0.6);
+  transition: transform 520ms var(--motion-ease), opacity 520ms var(--motion-ease);
+}
+.team-stack__card:nth-child(even) { border-color: var(--color-neon-lilac); box-shadow: var(--shadow-3), 0 10px 24px rgba(0, 0, 0, 0.6); }
+.team-stack__card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-xs);
+}
+.team-stack__caption {
+  display: block;
+  padding: 4px 0 6px;
+  text-align: center;
+  font-family: var(--font-family-script);
+  font-size: 20px;
+  letter-spacing: 0;
+  color: var(--color-neon-pink);
+  text-shadow: 0 0 8px rgba(255, 122, 184, 0.6);
+}
+.team-stack__card:nth-child(even) .team-stack__caption { color: var(--color-neon-lilac); text-shadow: 0 0 8px rgba(169, 155, 255, 0.6); }
+.team-stack__card[data-pos="0"] { z-index: 4; transform: rotate(-3deg); }
+.team-stack__card[data-pos="1"] { z-index: 3; transform: translate(12px, 4px) rotate(4deg); }
+.team-stack__card[data-pos="2"] { z-index: 2; transform: translate(-10px, 7px) rotate(-8deg); opacity: 0.9; }
+.team-stack__card[data-pos="3"] { z-index: 1; transform: translate(6px, 10px) rotate(9deg); opacity: 0.8; }
+.team-stack:hover .team-stack__card[data-pos="0"] { transform: rotate(-1deg) scale(1.03); }
+/* the top photo slides off to the side before it tucks under the pile */
+.team-stack__card.is-out { transform: translate(-115%, -14px) rotate(-20deg) !important; opacity: 0 !important; }
+
 .scene__lead {
   font-size: var(--font-size-2xl);
   line-height: 1.7;
@@ -453,36 +507,100 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 }
 .scene__lead strong { font-weight: var(--font-weight-base); color: var(--color-neon-pink); text-shadow: var(--glow-pink); }
 
+/* ---------- Four flowers, four wishes: neon cards that light up their flowers in the bouquet ---------- */
 .scene__desc {
-  font-size: var(--font-size-sm);
-  line-height: 1.7;
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
+  letter-spacing: 0.16em;
+  text-transform: lowercase;
+  text-wrap: balance;
   color: var(--color-text-tertiary);
+}
+.scene__desc::after { /* a short neon rule under the label */
+  content: "";
+  display: block;
+  width: 72px;
+  height: 1px;
+  margin-top: var(--space-4);
+  background: linear-gradient(90deg, var(--color-neon-pink), transparent);
+  box-shadow: 0 0 6px var(--color-neon-pink);
 }
 .meanings {
   list-style: none;
+  width: min(270px, 100%);
   margin: var(--space-7) 0 0;
   padding: 0;
   display: grid;
-  gap: var(--space-6);
+  gap: var(--space-4);
 }
-.meanings li {
+.meaning {
   display: flex;
   align-items: center;
-  gap: var(--space-5);
-  font-size: var(--font-size-xl);
-  color: var(--flower);
-  text-shadow: 0 0 12px var(--flower);
+  gap: var(--space-6);
+  width: 100%;
+  padding: var(--space-4) var(--space-6) var(--space-4) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--flower) 35%, transparent);
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--flower) 14%, transparent), rgba(5, 1, 8, 0.6) 70%);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--flower) 18%, transparent), inset 0 0 10px color-mix(in srgb, var(--flower) 10%, transparent);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--motion-duration-instant) var(--motion-ease), border-color var(--motion-duration-instant), box-shadow var(--motion-duration-instant);
+}
+.meaning:hover,
+.meaning:focus-visible,
+.meaning[aria-pressed="true"] {
+  transform: translateX(4px);
+  border-color: var(--flower);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--flower) 45%, transparent), inset 0 0 14px color-mix(in srgb, var(--flower) 22%, transparent);
+  outline: none;
+}
+.meaning:focus-visible { box-shadow: var(--focus-ring), 0 0 18px color-mix(in srgb, var(--flower) 45%, transparent); }
+.meaning__badge {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--flower) 60%, transparent);
+  background: radial-gradient(circle, color-mix(in srgb, var(--flower) 22%, transparent), transparent 70%);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--flower) 40%, transparent);
 }
 .meaning__flower {
-  flex: none;
   width: 30px;
   height: 30px;
   overflow: visible;
-  fill: color-mix(in srgb, var(--flower) 12%, transparent);
+  fill: color-mix(in srgb, var(--flower) 14%, transparent);
   stroke: var(--flower);
   stroke-width: 2.4;
   filter: drop-shadow(0 0 6px var(--flower));
+  animation: meaningSpin 14s linear infinite;
 }
+.meaning:hover .meaning__flower,
+.meaning[aria-pressed="true"] .meaning__flower { animation-duration: 3s; }
+@keyframes meaningSpin { to { rotate: 360deg; } }
+.meaning__text { display: grid; gap: 2px; min-width: 0; }
+.meaning__name {
+  font-size: var(--font-size-xl);
+  color: var(--flower);
+  text-shadow: 0 0 12px var(--flower);
+  white-space: nowrap;
+}
+.meaning__from {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+}
+.meaning__from:empty { display: none; }
+
+/* Focus one wish: its flowers in the bouquet brighten, the other colours fade back */
+.bouquet__svg g[class*="fill-"] { transition: opacity 300ms ease, filter 300ms ease; }
+.bouquet[data-focus] .bouquet__svg g[class*="fill-"] { opacity: 0.22; }
+.bouquet[data-focus="pink"] .bouquet__svg g.fill-pink,
+.bouquet[data-focus="gold"] .bouquet__svg g.fill-gold,
+.bouquet[data-focus="lilac"] .bouquet__svg g.fill-lilac,
+.bouquet[data-focus="mint"] .bouquet__svg g.fill-mint { opacity: 1; filter: brightness(1.4); }
 
 /* "Hold the bouquet" hint, right under it */
 .scene__hint {
@@ -1273,7 +1391,14 @@ html { scroll-behavior: smooth; }
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
   .scene__side { max-width: 36ch; text-align: center; }
-  .meanings { grid-template-columns: repeat(2, auto); justify-content: center; column-gap: var(--space-section); }
+  .team-stack { margin-inline: auto; } /* centred once the sides stack under the bouquet */
+  .scene__desc::after { margin-inline: auto; background: linear-gradient(90deg, transparent, var(--color-neon-pink), transparent); }
+  .meanings { width: min(420px, 100%); margin-inline: auto; grid-template-columns: repeat(2, 1fr); }
+  .meaning { gap: var(--space-4); padding-right: var(--space-4); }
+  .meaning:hover, .meaning:focus-visible, .meaning[aria-pressed="true"] { transform: translateY(-2px); }
+  .meaning__badge { width: 36px; height: 36px; }
+  .meaning__flower { width: 24px; height: 24px; }
+  .meaning__name { font-size: var(--font-size-md); }
   .scene {
     display: flex;
     flex-direction: column;

@@ -17,7 +17,7 @@
       flower: "pink",
       meaning: "Rạng rỡ",
       wish: "Nhân ngày 20/10, Hùm chúc những bông hoa xinh đẹp của LightHuman luôn giữ được nụ cười, sự tự tin và nguồn năng lượng tích cực vốn có. Cảm ơn mọi người vì đã mang đến sự ấm áp, tinh tế và những điều đẹp đẽ cho tập thể. Mong rằng mỗi ngày của các chị em đều ngập tràn yêu thương, được trân trọng và luôn hạnh phúc với những gì mình lựa chọn.",
-      sign: "Mãi iu, Hùm",
+      sign: "Hùm",
     },
     {
       name: "Hòn Trợn",
@@ -27,7 +27,7 @@
       flower: "gold",
       meaning: "Tươi vui",
       wish: "Chúc các chị em không chỉ có một ngày 20/10 thật vui mà cả 365 ngày trong năm đều được yêu thương đúng cách. Mong mọi người luôn đủ mạnh mẽ để theo đuổi ước mơ, đủ dịu dàng để tận hưởng cuộc sống và đủ tự tin để biết rằng mình xứng đáng với những điều tốt đẹp nhất. Hãy luôn là phiên bản tuyệt vời nhất của chính mình nhé!",
-      sign: "Mãi iu, Trợn",
+      sign: "Trợn",
     },
     {
       name: "Tuấn Kẹc",
@@ -37,7 +37,7 @@
       flower: "lilac",
       meaning: "Bình an",
       wish: "Chúc các chị em nhà LightHuman ngày 20/10 luôn xinh đẹp như ảnh đã chỉnh màu, trẻ trung như tuổi trong CV và giàu có như số lần nói “để em làm cho”. Mong mọi người luôn rạng rỡ, vui vẻ, deadline né xa, lương về đúng hẹn và mỗi ngày đi làm đều được đối xử như công chúa, ít nhất là đến giờ tan ca!",
-      sign: "Mãi iu, Kẹc",
+      sign: "Kẹc",
     },
     {
       name: "Lê Bống",
@@ -48,7 +48,7 @@
       meaning: "Hạnh phúc",
       // \n xuống dòng: thẻ giữ nguyên ngắt dòng (white-space: pre-line)
       wish: "Chúc các chị em nhà LightHuman luôn:\n– Ví tiền dày hơn áp lực công việc.\n– Nụ cười nhiều hơn số CV cần lọc.\n– Tin nhắn phản hồi nhiều hơn số lần ứng viên “seen không rep”.\nVà luôn tìm được những ứng viên chất lượng nhanh hơn tốc độ quản lý yêu cầu tuyển gấp hệ hệ.",
-      sign: "Mãi iu, Bống",
+      sign: "Bống",
     },
   ];
 
@@ -1267,6 +1267,71 @@
   }, { rootMargin: "-50% 0px -50% 0px" });
   chapters.forEach((c) => chapterIO.observe(c));
 
+  /* ---------- BD team photo pile: the top polaroid slides off and tucks under, on a timer or on tap ---------- */
+  const teamStack = document.getElementById("teamStack");
+  const teamOrder = [...teamStack.querySelectorAll(".team-stack__card")];
+  const layoutTeam = () => teamOrder.forEach((c, i) => { c.dataset.pos = String(i); });
+  let teamBusy = false;
+  const nextTeam = () => {
+    if (teamBusy) return;
+    if (reduceMotion.matches) { teamOrder.push(teamOrder.shift()); layoutTeam(); return; }
+    teamBusy = true;
+    const top = teamOrder[0];
+    top.classList.add("is-out");
+    setTimeout(() => {
+      top.classList.remove("is-out");
+      teamOrder.push(teamOrder.shift());
+      layoutTeam();
+      teamBusy = false;
+    }, 430);
+  };
+  let teamTimer = 0;
+  const scheduleTeam = () => {
+    clearInterval(teamTimer);
+    teamTimer = setInterval(() => {
+      if (!stage2.hidden && !document.hidden && !reduceMotion.matches) nextTeam();
+    }, 3600);
+  };
+  teamStack.addEventListener("click", () => { nextTeam(); scheduleTeam(); });
+  layoutTeam();
+  scheduleTeam();
+
+  /* ---------- Wish cards beside the bouquet: text from TEAM, hover/tap lights up that colour in the bouquet ---------- */
+  const meaningBtns = [...document.querySelectorAll(".meaning")];
+  meaningBtns.forEach((btn) => {
+    const m = TEAM.find((t) => t.flower === btn.dataset.flower);
+    if (!m) return;
+    btn.querySelector(".meaning__name").textContent = m.meaning;
+    btn.querySelector(".meaning__from").textContent = `từ ${m.name}`;
+  });
+
+  let pinnedFlower = null; // set by a tap/click, survives the pointer leaving
+  const showFlower = (f) => {
+    if (f) bouquet.dataset.focus = f;
+    else delete bouquet.dataset.focus;
+  };
+  const resetMeanings = () => {
+    pinnedFlower = null;
+    meaningBtns.forEach((b) => b.setAttribute("aria-pressed", "false"));
+    showFlower(null);
+  };
+  meaningBtns.forEach((btn) => {
+    const f = btn.dataset.flower;
+    btn.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") showFlower(f); });
+    btn.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") showFlower(pinnedFlower); });
+    btn.addEventListener("focus", () => showFlower(f));
+    btn.addEventListener("blur", () => showFlower(pinnedFlower));
+    btn.addEventListener("click", () => {
+      pinnedFlower = pinnedFlower === f ? null : f;
+      meaningBtns.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.flower === pinnedFlower)));
+      showFlower(pinnedFlower || (btn.matches(":hover") ? f : null));
+      if (pinnedFlower) {
+        const [x, y] = centerOf(btn.querySelector(".meaning__badge"));
+        burst(x, y, 16, 110, [FLOWER_RGB[f] || PINK, GOLD]);
+      }
+    });
+  });
+
   /* =========================================================
      FLOW: gift -> open -> bouquet & story
      ========================================================= */
@@ -1325,6 +1390,7 @@
     morph = [];
     beam = null;
     resetConstellation();
+    resetMeanings();
     shot.clear();
     window.scrollTo({ top: 0, behavior: "instant" });
     updateDawn();

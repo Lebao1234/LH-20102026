@@ -185,16 +185,25 @@
 
     <!-- Hai bên bó hoa: trái là lời gửi, phải là ý nghĩa từng bông (màu khớp với người trao ở chương lời chúc) -->
     <div class="scene__side scene__side--left pop">
-      <p class="scene__lead"><strong>BD Hệ thống</strong> xin gửi tặng tất cả các bạn, các chị em nhà LightHuman một bó hoa bự bành ki.</p>
+      <!-- Xấp ảnh team BD Hệ thống: tự lật lần lượt, bấm để chuyển ảnh -->
+      <button class="team-stack" type="button" id="teamStack" aria-label="Ảnh team BD Hệ thống, bấm để xem ảnh tiếp theo">
+        <span class="team-stack__card"><img src="img/team/bd-1.jpg" width="640" height="480" alt="Bốn thành viên BD Hệ thống khoác vai nhau bên bến thuyền" decoding="async" /><span class="team-stack__caption">BD Hệ thống</span></span>
+        <span class="team-stack__card"><img src="img/team/bd-2.jpg" width="640" height="480" alt="BD Hệ thống đi chơi cùng các bạn, ngồi quanh bàn gỗ giơ tay chữ V" decoding="async" /><span class="team-stack__caption">BD Hệ thống</span></span>
+        <span class="team-stack__card"><img src="img/team/bd-3.jpg" width="640" height="480" alt="Bốn thành viên BD Hệ thống đội mũ bảo hiểm chụp selfie bên đường" decoding="async" /><span class="team-stack__caption">BD Hệ thống</span></span>
+        <span class="team-stack__card"><img src="img/team/bd-4.jpg" width="640" height="480" alt="Bốn thành viên BD Hệ thống đeo kính ngộ nghĩnh chụp ảnh gương" decoding="async" /><span class="team-stack__caption">BD Hệ thống</span></span>
+      </button>
+      <p class="scene__lead"><strong>F4 BD Hệ thống</strong> xin gửi tặng tất cả các bạn, các chị em nhà LightHuman một bó hoa bự chà bá lửa </p>
     </div>
 
     <div class="scene__side scene__side--right pop">
-      <p class="scene__desc">Mỗi bông là một điều tụi mình mong:</p>
+      <p class="scene__desc">Mỗi bông là một điều tụi mình mong</p>
+      <!-- Ý nghĩa và tên người trao được điền từ mảng TEAM trong script.js;
+           rê chuột / chạm vào một thẻ thì các bông cùng màu trong bó hoa sáng lên -->
       <ul class="meanings">
-        <li data-flower="pink"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg>Rạng rỡ</li>
-        <li data-flower="gold"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg>Tươi vui</li>
-        <li data-flower="lilac"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg>Bình an</li>
-        <li data-flower="mint"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg>Hạnh phúc</li>
+        <li><button class="meaning" type="button" data-flower="pink" aria-pressed="false"><span class="meaning__badge"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg></span><span class="meaning__text"><span class="meaning__name">Rạng rỡ</span><span class="meaning__from"></span></span></button></li>
+        <li><button class="meaning" type="button" data-flower="gold" aria-pressed="false"><span class="meaning__badge"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg></span><span class="meaning__text"><span class="meaning__name">Tươi vui</span><span class="meaning__from"></span></span></button></li>
+        <li><button class="meaning" type="button" data-flower="lilac" aria-pressed="false"><span class="meaning__badge"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg></span><span class="meaning__text"><span class="meaning__name">Bình an</span><span class="meaning__from"></span></span></button></li>
+        <li><button class="meaning" type="button" data-flower="mint" aria-pressed="false"><span class="meaning__badge"><svg class="meaning__flower" viewBox="-26 -26 52 52" aria-hidden="true"><use href="#flw" /></svg></span><span class="meaning__text"><span class="meaning__name">Hạnh phúc</span><span class="meaning__from"></span></span></button></li>
       </ul>
     </div>
 
