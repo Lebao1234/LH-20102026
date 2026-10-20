@@ -7,6 +7,8 @@
 :root {
   /* font */
   --font-family-primary: ui-monospace, "SF Mono", Menlo, Consolas, "Roboto Mono", "DejaVu Sans Mono", monospace;
+  /* handwriting, signatures only */
+  --font-family-script: "Dancing Script", "Segoe Script", "Brush Script MT", cursive;
   --font-size-xs: 14px;
   --font-size-sm: 15.5px;
   --font-size-md: 16px;
@@ -89,6 +91,14 @@ body {
 h1, h2, p { margin: 0; }
 button { font: inherit; color: inherit; letter-spacing: inherit; }
 [hidden] { display: none !important; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
 /* ---------- Background: night horizon + canvas fx ---------- */
 .bg {
@@ -97,6 +107,38 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
   z-index: 0;
   pointer-events: none;
   background: radial-gradient(100% 55% at 50% 100%, #14082a 0%, var(--color-surface-base) 72%);
+  overflow: hidden;
+}
+/* Sunrise: --dawn (0..1) is set from the scroll position by script.js.
+   The sky stays dark at the top so text keeps its contrast; only the horizon warms up. */
+.bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(20, 8, 48, 0) 0%,
+    rgba(58, 20, 80, 0.5) 45%,
+    rgba(150, 50, 95, 0.55) 72%,
+    rgba(240, 140, 110, 0.6) 92%,
+    rgba(255, 200, 130, 0.7) 100%);
+  opacity: var(--dawn, 0);
+}
+.bg::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(70vw, 560px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 240, 200, 0.95) 0%,
+    rgba(255, 196, 120, 0.8) 22%,
+    rgba(255, 130, 140, 0.35) 45%,
+    transparent 68%);
+  /* rises from below the horizon as --dawn goes 0 -> 1 */
+  transform: translate(-50%, calc(55% + (1 - var(--dawn, 0)) * 60%));
+  opacity: var(--dawn, 0);
 }
 .fx {
   position: fixed;
@@ -106,6 +148,7 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
   z-index: 1;
   pointer-events: none;
 }
+.fx--top { z-index: 9; } /* above the content, below the pills */
 
 /* ---------- Neon line-art primitives (SVG) ---------- */
 .ln-pink  { stroke: var(--color-neon-pink);  stroke-width: 3; }
@@ -122,6 +165,19 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 .neon {
   color: var(--color-neon-pink);
   text-shadow: var(--glow-pink);
+}
+/* Unlit until it scrolls into view, then flickers on like a sign being plugged in */
+.js .neon:not(.is-lit) { opacity: 0.28; text-shadow: none; }
+.neon.is-lit { animation: neonOn 1.3s linear both; }
+.scene .neon.is-lit { animation-delay: 0.5s; } /* wait for the title to rise first */
+@keyframes neonOn {
+  0%       { opacity: 0.28; text-shadow: none; }
+  8%       { opacity: 1;    text-shadow: var(--glow-pink); }
+  12%      { opacity: 0.3;  text-shadow: none; }
+  20%      { opacity: 1;    text-shadow: var(--glow-pink); }
+  24%, 40% { opacity: 0.35; text-shadow: none; }
+  44%      { opacity: 1;    text-shadow: var(--glow-pink); }
+  100%     { opacity: 1;    text-shadow: var(--glow-pink); }
 }
 
 /* ---------- STAGE 1: gift ---------- */
@@ -149,6 +205,14 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
   display: grid;
   gap: var(--space-4);
   justify-items: center;
+}
+.order__logo {
+  display: block;
+  width: min(220px, 56vw);
+  height: auto;
+  margin-bottom: var(--space-4);
+  /* soft neon halo: white for the wordmark, gold for the mark */
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.28)) drop-shadow(0 0 18px rgba(255, 217, 138, 0.3));
 }
 .order__title {
   font-size: var(--font-size-3xl);
@@ -189,8 +253,30 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 .gift:hover .gift__lid { transform: translateY(-4px) rotate(-3deg); }
 .gift__stars { animation: twinkle 2.4s ease-in-out infinite; }
 
+/* Every few seconds the box rattles, the lid lifts a crack and light leaks out */
+.gift__box {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: peekShake 4.2s ease-in-out 1.5s infinite;
+}
+.gift__lid { animation: peekLid 4.2s ease-in-out 1.5s infinite; }
+.gift__rays { opacity: 0; animation: peekRays 4.2s ease-in-out 1.5s infinite; }
+
+.gift.is-open .gift__box,
+.gift.is-open .gift__lid { animation: none; }
+.gift.is-open .gift__rays { animation: none; opacity: 1; }
 .gift.is-open .gift__lid { transform: translate(-6px, -46px) rotate(-24deg); }
 .gift.is-open .gift__svg { animation: giftOut var(--motion-duration-normal) var(--motion-ease) forwards; }
+
+@keyframes peekShake {
+  0%, 72%, 92%, 100% { rotate: 0deg; }
+  76% { rotate: -4deg; }
+  80% { rotate: 3.5deg; }
+  84% { rotate: -2.5deg; }
+  88% { rotate: 1.5deg; }
+}
+@keyframes peekLid  { 0%, 72%, 96%, 100% { translate: 0 0; } 78%, 90% { translate: 0 -5px; } }
+@keyframes peekRays { 0%, 72%, 96%, 100% { opacity: 0; } 78%, 90% { opacity: 1; } }
 
 /* ---------- Buttons (primary, outlined neon) ---------- */
 .btn {
@@ -266,8 +352,46 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
   border-radius: var(--radius-md);
   background: none;
   cursor: pointer;
+  position: relative;
+}
+/* Glow that breathes with the music; --beat (0..1) is set by script.js */
+.bouquet::before {
+  content: "";
+  position: absolute;
+  inset: 0 -12% 8%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 122, 184, 0.32), rgba(169, 155, 255, 0.12) 60%, transparent);
+  opacity: var(--beat, 0);
+  transform: scale(calc(0.85 + var(--beat, 0) * 0.3));
+  pointer-events: none;
 }
 .bouquet:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Hold to charge (--charge 0..1 from script.js), release to bloom */
+.bouquet {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.bouquet.is-charging::before { opacity: max(var(--beat, 0), var(--charge, 0)); }
+.bouquet.is-charging .bouquet__svg {
+  transform: scale(calc(1 + var(--charge, 0) * 0.07));
+  animation: jitter 90ms linear infinite;
+}
+@keyframes jitter {
+  0%, 100% { translate: 0 0; }
+  25% { translate: calc(var(--charge, 0) * 2px) 0; }
+  50% { translate: 0 calc(var(--charge, 0) * -2px); }
+  75% { translate: calc(var(--charge, 0) * -2px) 0; }
+}
+/* Same bloom as the entrance (unchanged, so it keeps its finished state) plus a spin on top */
+.scene.is-in .bouquet.is-bloom .fl {
+  animation: bloom 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.25) forwards, spinBloom 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-delay: var(--d), 0s;
+}
+@keyframes spinBloom { from { rotate: 0deg; scale: 1.4; } to { rotate: 360deg; scale: 1; } }
 .bouquet__svg {
   width: 100%;
   height: 100%;
@@ -360,13 +484,32 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
   filter: drop-shadow(0 0 6px var(--flower));
 }
 
+/* "Hold the bouquet" hint, right under it */
 .scene__hint {
-  margin-top: var(--space-4);
+  margin: calc(var(--space-4) * -1) 0 var(--space-6);
   text-wrap: balance;
   font-size: var(--font-size-xs);
   color: var(--color-text-tertiary);
 }
-.scene__hint i { font-size: 18px; vertical-align: -3px; margin-right: var(--space-1); color: var(--color-neon-pink); }
+.scene__hint i {
+  display: inline-block;
+  font-size: 18px;
+  vertical-align: -3px;
+  margin-right: var(--space-1);
+  color: var(--color-neon-pink);
+  text-shadow: var(--glow-pink);
+  animation: hintPress 1.8s ease-in-out infinite;
+}
+/* the hand presses down and holds, like the gesture it describes */
+@keyframes hintPress {
+  0%, 100% { translate: 0 0; scale: 1; }
+  30%, 70% { translate: 0 3px; scale: 0.9; }
+}
+.hint--mouse { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .hint--mouse { display: inline; }
+  .hint--touch { display: none; }
+}
 
 /* Fixed bottom pills */
 .pill {
@@ -417,6 +560,8 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 .music__bars i:nth-child(2) { animation-delay: -300ms; }
 .music__bars i:nth-child(3) { animation-delay: -600ms; }
 .music__bars i:nth-child(4) { animation-delay: -150ms; }
+/* With the analyser running, script.js sets each bar from the real frequency bands */
+.music.is-live .music__bars i { animation: none; transform: scaleY(0.2); transition: transform 90ms linear; }
 .music[data-state="playing"] .music__bars { display: inline-flex; }
 .music[data-state="playing"] .music__icon { display: none; }
 
@@ -577,18 +722,20 @@ html { scroll-behavior: smooth; }
   position: absolute;
   left: 50%;
   top: 72%;
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   translate: -50% -50%;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  border: 1px solid var(--color-neon-pink);
+  border: 1px solid var(--color-neon-gold);
   background: var(--color-surface-base);
-  color: var(--color-neon-pink);
-  font-size: 20px;
-  text-shadow: var(--glow-pink);
-  box-shadow: var(--shadow-2);
+  box-shadow: 0 0 14px rgba(255, 217, 138, 0.45), inset 0 0 10px rgba(255, 217, 138, 0.2);
+}
+.env__seal img {
+  width: 42px;
+  height: auto;
+  filter: drop-shadow(0 0 4px rgba(255, 217, 138, 0.7));
 }
 
 /* ---------- Chapter headings (shared) ---------- */
@@ -617,11 +764,16 @@ html { scroll-behavior: smooth; }
   padding-bottom: 35vh;
 }
 
-/* Each page pins a little lower than the one before, so they pile up like letters */
+/* Each page pins a little lower than the one before, so they pile up like letters.
+   .note carries pinning + scroll entrance; .note__card carries the paper and the 3D tilt. */
 .note {
   position: sticky;
   top: calc(12vh + var(--i, 0) * 28px);
   width: 100%;
+  rotate: var(--tilt, 0deg);
+}
+.note__card {
+  position: relative;
   padding: var(--space-section) var(--space-section) var(--space-8);
   border: 1px solid rgba(255, 122, 184, 0.55);
   border-radius: var(--radius-md);
@@ -629,9 +781,20 @@ html { scroll-behavior: smooth; }
     repeating-linear-gradient(180deg, transparent 0 30px, rgba(255, 122, 184, 0.07) 30px 31px),
     #050108;
   box-shadow: var(--shadow-2), 0 -18px 40px rgba(0, 0, 0, 0.7);
-  rotate: var(--tilt, 0deg);
+  /* --rx/--ry/--gx/--gy are set on #notes by script.js (mouse or gyroscope) */
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 500ms var(--motion-ease);
 }
-.note--lilac { border-color: rgba(169, 155, 255, 0.6); box-shadow: var(--shadow-3), 0 -18px 40px rgba(0, 0, 0, 0.7); }
+/* Soft sheen that slides across the paper as it tilts */
+.note__card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255, 255, 255, 0.07), transparent 55%);
+  pointer-events: none;
+}
+.note--lilac .note__card { border-color: rgba(169, 155, 255, 0.6); box-shadow: var(--shadow-3), 0 -18px 40px rgba(0, 0, 0, 0.7); }
 .note:nth-child(odd) { --tilt: -1.2deg; }
 .note:nth-child(even) { --tilt: 1.4deg; }
 
@@ -653,6 +816,18 @@ html { scroll-behavior: smooth; }
   color: var(--color-neon-pink);
   text-shadow: var(--glow-pink);
   box-shadow: 0 0 14px rgba(255, 122, 184, 0.4), inset 0 0 10px rgba(255, 122, 184, 0.2);
+}
+/* Photo avatars: the neon ring stays, the photo sits just inside it */
+.note__avatar.has-photo,
+.paper__team span.has-photo { padding: 2px; overflow: hidden; }
+.note__avatar.has-photo { width: 64px; height: 64px; }
+.note__avatar img,
+.paper__team img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 .note--lilac .note__avatar {
   color: var(--color-neon-lilac);
@@ -691,26 +866,70 @@ html { scroll-behavior: smooth; }
   stroke: var(--flower);
   stroke-width: 2.4;
   filter: drop-shadow(0 0 6px var(--flower));
+  opacity: 0.25;
+  scale: 0.7;
+  transition: opacity var(--motion-duration-instant), scale var(--motion-duration-instant);
 }
+/* The flower flown in from the bouquet lands here */
+.note.is-received .note__flower { opacity: 1; scale: 1; animation: receive 600ms var(--motion-ease); }
+@keyframes receive { 0% { scale: 0.6; } 45% { scale: 1.4; } 100% { scale: 1; } }
 [data-flower="pink"]  { --flower: var(--color-neon-pink); }
 [data-flower="gold"]  { --flower: var(--color-neon-gold); }
 [data-flower="lilac"] { --flower: var(--color-neon-lilac); }
 [data-flower="mint"]  { --flower: var(--color-neon-mint); }
 
 .note__wish {
+  white-space: pre-line;
   font-size: var(--font-size-lg);
   line-height: 1.8;
   color: var(--color-text-secondary);
 }
-.note__sign {
-  margin-top: var(--space-8);
-  text-align: right;
-  font-size: var(--font-size-sm);
-  color: var(--color-neon-pink);
-  text-shadow: 0 0 10px rgba(255, 122, 184, 0.6);
+/* Typewriter: the caret is an empty inline border so it never adds a wrap point mid-word */
+.wish__ghost { color: transparent; }
+.wish__caret { display: none; }
+.note.is-typing .wish__caret {
+  display: inline;
+  margin-right: -2px;
+  border-left: 2px solid var(--flower);
+  box-shadow: 0 0 8px var(--flower);
+  animation: caret 0.9s steps(1) infinite;
 }
-.note--lilac .note__sign { color: var(--color-neon-lilac); text-shadow: 0 0 10px rgba(169, 155, 255, 0.6); }
-.note__sign i { vertical-align: -2px; margin-right: var(--space-1); }
+@keyframes caret { 50% { opacity: 0; } }
+
+/* Handwritten signature, drawn in neon once the wish is typed */
+.note__sign {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  color: var(--flower);
+}
+.sign__svg { flex: 1; min-width: 0; height: 52px; overflow: visible; }
+.sign__svg text {
+  font-family: var(--font-family-script);
+  font-size: 36px;
+  letter-spacing: 0;
+  fill: transparent;
+  stroke: var(--flower);
+  stroke-width: 1.1;
+  stroke-dasharray: 260;
+  stroke-dashoffset: 260;
+  filter: drop-shadow(0 0 4px var(--flower));
+}
+.note.is-signed .sign__svg text { animation: sign 2.4s ease-out forwards; }
+@keyframes sign {
+  65%  { stroke-dashoffset: 0; fill: transparent; }
+  100% { stroke-dashoffset: 0; fill: color-mix(in srgb, var(--flower) 85%, transparent); }
+}
+.note__sign i {
+  display: inline-block;
+  font-size: 22px;
+  text-shadow: 0 0 10px var(--flower);
+  opacity: 0;
+  scale: 0.4;
+  transition: opacity 400ms ease 1.6s, scale 500ms cubic-bezier(0.2, 0.9, 0.3, 1.5) 1.6s;
+}
+.note.is-signed .note__sign i { opacity: 1; scale: 1; }
 
 /* ---------- Chapter 4: group photos (two polaroids develop on scroll) ---------- */
 .photo { position: relative; z-index: 2; }
@@ -738,7 +957,8 @@ html { scroll-behavior: smooth; }
 .photo__title { margin: 0; }
 
 .polaroids {
-  --pw: min(440px, 40vw, calc((100dvh - 330px) * 1.33));
+  /* height budget: title, thank-you line, signature line and gaps take ~450px */
+  --pw: min(440px, 40vw, calc((100dvh - 450px) * 1.33));
   display: grid;
   grid-template-columns: repeat(2, var(--pw));
   gap: var(--space-section);
@@ -762,6 +982,30 @@ html { scroll-behavior: smooth; }
   background: #0a0410;
 }
 .polaroid__img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Camera flash on just this photo (pseudo-elements, so the polaroid's own
+   scroll-driven entrance animation is left untouched) */
+.polaroid { position: relative; }
+.polaroid__img { position: relative; }
+.polaroid__img::after,
+.polaroid::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+.polaroid__img::after {
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, #fff 0%, rgba(255, 245, 250, 0.9) 55%, rgba(255, 225, 240, 0.75) 100%);
+}
+.polaroid::after {
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px #fff, 0 0 28px 6px rgba(255, 255, 255, 0.8), 0 0 60px 12px rgba(255, 200, 230, 0.5);
+}
+.polaroid.is-flash .polaroid__img::after,
+.polaroid.is-flash::after { animation: cameraFlash 650ms ease-out; }
+@keyframes cameraFlash { 0% { opacity: 0; } 8% { opacity: 0.9; } 100% { opacity: 0; } }
 .polaroid__caption {
   padding: var(--space-7) var(--space-4) var(--space-8);
   text-align: center;
@@ -769,12 +1013,67 @@ html { scroll-behavior: smooth; }
   line-height: 1.6;
   color: var(--color-text-secondary);
 }
+.photo__thanks {
+  max-width: 72ch;
+  font-size: var(--font-size-lg);
+  line-height: 1.7;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-text-secondary);
+  text-shadow: 0 0 6px var(--color-surface-base), 0 0 14px var(--color-surface-base); /* stays legible over the neon grass */
+}
+/* The thank-you line sits right above the signature, so the gap between them is tighter */
+.photo__thanks + .photo__end { margin-top: calc(var(--space-8) - var(--space-section)); }
 .photo__end {
   font-size: var(--font-size-2xl);
   text-align: center;
   text-wrap: balance;
-  text-shadow: var(--glow-text);
+  /* dark halo first: this line sits right in front of the rising sun */
+  text-shadow: 0 0 6px var(--color-surface-base), 0 0 14px var(--color-surface-base), var(--glow-text);
 }
+.photo__end .neon.is-lit { text-shadow: 0 0 6px var(--color-surface-base), 0 0 14px var(--color-surface-base), var(--glow-pink); }
+
+/* ---------- Chapter 5: the LightHuman constellation (drawn on the canvas over .finale__sky) ---------- */
+.finale {
+  position: relative;
+  z-index: 2;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-section);
+  padding: var(--space-page) var(--space-8) calc(var(--space-page) * 2);
+  text-align: center;
+}
+.finale .chapter__title { margin: 0; }
+.finale__sky {
+  width: min(560px, 86vw);
+  aspect-ratio: 155 / 91;
+}
+/* The real mark glows in faintly behind the stars once they are all joined */
+.finale__sky img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  /* the source mark is small; a light blur turns its pixels into a soft glow */
+  filter: blur(2px) drop-shadow(0 0 18px rgba(255, 217, 138, 0.6));
+  transition: opacity 1.6s ease;
+}
+.finale.is-done .finale__sky img { opacity: 0.22; }
+.finale__text {
+  max-width: 40ch;
+  font-size: var(--font-size-xl);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  text-wrap: balance;
+  text-shadow: var(--glow-text);
+  opacity: 0;
+  translate: 0 12px;
+  transition: opacity var(--motion-duration-normal) var(--motion-ease) 0.4s, translate var(--motion-duration-normal) var(--motion-ease) 0.4s;
+}
+.finale.is-done .finale__text { opacity: 1; translate: 0 0; }
 
 /* ---------- Story progress: right rail (desktop), top bar (mobile) ---------- */
 .story {
@@ -880,11 +1179,12 @@ html { scroll-behavior: smooth; }
     }
     .note:nth-child(even) { --tilt-in: 5deg; }
 
-    .polaroid, .polaroid__img img, .photo__title, .photo__end {
+    .polaroid, .polaroid__img img, .photo__title, .photo__thanks, .photo__end {
       animation-timing-function: linear;
       animation-fill-mode: both;
       animation-timeline: --photo;
     }
+    .photo__thanks { animation-name: fadeUp; animation-range: contain 68% contain 84%; }
     .photo__title { animation-name: fadeUp; animation-range: contain 0% contain 12%; }
     /* Photo 1 lands and develops, then photo 2 flies in beside it */
     .polaroid--1 { animation-name: polaroidIn;  animation-range: contain 0% contain 28%; }
@@ -895,8 +1195,8 @@ html { scroll-behavior: smooth; }
 
     /* Phones: photos stack, so each one reveals as it enters view */
     @media (max-width: 640px) {
-      .polaroid, .polaroid__img img, .photo__title, .photo__end { animation-timeline: view(); }
-      .photo__title { animation-range: entry 0% entry 100%; }
+      .polaroid, .polaroid__img img, .photo__title, .photo__thanks, .photo__end { animation-timeline: view(); }
+      .photo__title, .photo__thanks { animation-range: entry 0% entry 100%; }
       .polaroid--1, .polaroid--2 { animation-range: entry 0% cover 40%; }
       .polaroid--1 .polaroid__img img,
       .polaroid--2 .polaroid__img img { animation-range: entry 40% cover 50%; }
@@ -916,13 +1216,15 @@ html { scroll-behavior: smooth; }
     .note { transition: opacity var(--motion-duration-normal) var(--motion-ease), transform var(--motion-duration-normal) var(--motion-ease); }
     .note:not(.is-visible) { opacity: 0; transform: translateY(80px); }
 
-    .polaroid, .photo__end { transition: opacity var(--motion-duration-normal) var(--motion-ease), transform var(--motion-duration-normal) var(--motion-ease); }
+    .polaroid, .photo__thanks, .photo__end { transition: opacity var(--motion-duration-normal) var(--motion-ease), transform var(--motion-duration-normal) var(--motion-ease); }
     .polaroid__img img { transition: filter 1.6s var(--motion-ease); }
     .polaroid--2, .polaroid--2 .polaroid__img img { transition-delay: 0.5s; }
-    .photo__end { transition-delay: 1s; }
+    .photo__thanks { transition-delay: 0.8s; }
+    .photo__end { transition-delay: 1.1s; }
     .photo:not(.is-in) .polaroid--1 { opacity: 0; transform: translate(-30%, 90px) rotate(-12deg) scale(0.85); }
     .photo:not(.is-in) .polaroid--2 { opacity: 0; transform: translate(60%, 60px) rotate(16deg) scale(0.85); }
     .photo:not(.is-in) .polaroid__img img { filter: blur(12px) grayscale(1) brightness(0.3); }
+    .photo:not(.is-in) .photo__thanks,
     .photo:not(.is-in) .photo__end { opacity: 0; transform: translateY(20px); }
   }
 }
@@ -957,10 +1259,15 @@ html { scroll-behavior: smooth; }
 }
 
 @media (max-width: 640px) {
-  .note { --tilt: 0deg !important; top: calc(10vh + var(--i, 0) * 18px); padding: var(--space-8); }
+  .note { --tilt: 0deg !important; top: calc(10vh + var(--i, 0) * 18px); }
+  .note__card { padding: var(--space-8); }
+  .sign__svg { height: 46px; }
+  .sign__svg text { font-size: 32px; }
   .note__wish { font-size: var(--font-size-md); line-height: 1.7; }
+  /* Phones: keep the opening line, drop the initials row to make room */
   .paper { padding: var(--space-5) var(--space-6); }
-  .paper__text { display: none; }
+  .paper__text { font-size: 13px; line-height: 1.55; }
+  .paper__team { display: none; }
 }
 
 /* ---------- Responsive ---------- */
@@ -996,7 +1303,17 @@ html { scroll-behavior: smooth; }
     animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
   }
-  .gift__svg, .bouquet__sway, .gift__stars { animation: none !important; }
+  .gift__svg, .bouquet__sway, .gift__stars, .gift__box, .gift__lid { animation: none !important; }
+  .gift__rays { animation: none !important; opacity: 0; }
+  .scene__hint { display: none; } /* hold-to-bloom is off with reduced motion */
+  .note__card { transform: none; }
+  .note__flower { opacity: 1; scale: 1; }
+  .sign__svg text { stroke-dashoffset: 0; fill: color-mix(in srgb, var(--flower) 85%, transparent); }
+  .note__sign i { opacity: 1; scale: 1; }
+  .js .neon:not(.is-lit) { opacity: 1; text-shadow: var(--glow-pink); }
+  .finale__sky img { opacity: 0.8; }
+  .finale__text { opacity: 1; translate: 0 0; }
+  .polaroid__img::after, .polaroid::after { display: none; }
   .stem { stroke-dashoffset: 0; }
   .leaf { opacity: 1; }
   .fl { scale: 1; }

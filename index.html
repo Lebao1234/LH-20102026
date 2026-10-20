@@ -6,19 +6,27 @@
   <title>20/10 nhà LightHuman</title>
   <meta name="description" content="BD Hệ thống gửi tất cả các bạn, các chị em nhà LightHuman một bó hoa 20/10 cùng bốn lời chúc: rạng rỡ, tươi vui, bình an và hạnh phúc." />
   <meta name="theme-color" content="#000000" />
+  <link rel="icon" type="image/png" href="img/favicon.png" />
   <link rel="preload" href="Chamhoa.mp3" as="audio" type="audio/mpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap" />
   <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="bg" aria-hidden="true"></div>
   <canvas id="fx" class="fx" aria-hidden="true"></canvas>
+  <!-- Lớp hiệu ứng nằm trên nội dung: cột sáng, hạt tụ chữ, đèn flash -->
+  <canvas id="fxTop" class="fx fx--top" aria-hidden="true"></canvas>
 
   <audio id="song" src="Chamhoa.mp3" loop preload="auto"></audio>
 
   <!-- ===== STAGE 1: hộp quà neon ===== -->
   <section class="order" id="order" aria-labelledby="orderTitle">
     <header class="order__header">
+      <!-- Bản logo cho nền tối: chữ trắng, biểu tượng vàng, nền trong suốt -->
+      <img class="order__logo" src="img/logo-lighthuman.png" width="327" height="141" alt="LightHuman Personnel Love" />
       <h1 class="order__title" id="orderTitle">Hộp quà <span class="neon">20/10</span></h1>
       <p class="order__kicker">Gửi các chị em nhà LightHuman</p>
     </header>
@@ -27,16 +35,23 @@
     <button class="gift" type="button" id="gift" tabindex="-1" aria-hidden="true">
       <svg class="gift__svg" viewBox="0 0 200 200" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <ellipse class="gift__floor" cx="100" cy="186" rx="70" ry="7" />
-        <g class="gift__body">
-          <rect x="42" y="96" width="116" height="84" rx="7" class="ln-pink fill-pink" />
-          <path d="M100 96 V180" class="ln-lilac" />
-        </g>
-        <g class="gift__lid">
-          <rect x="32" y="74" width="136" height="24" rx="7" class="ln-pink fill-pink" />
-          <path d="M100 74 V98" class="ln-lilac" />
-          <path d="M100 74 C82 44 56 52 70 68 C78 76 92 76 100 74 Z" class="ln-lilac fill-lilac" />
-          <path d="M100 74 C118 44 144 52 130 68 C122 76 108 76 100 74 Z" class="ln-lilac fill-lilac" />
-          <circle cx="100" cy="74" r="5" class="ln-gold" />
+        <g class="gift__box">
+          <!-- Ánh sáng lọt qua khe nắp mỗi lần hộp rung -->
+          <g class="gift__rays ln-gold thin">
+            <path d="M46 95 H154" />
+            <path d="M30 95 L10 86 M30 97 L8 104 M170 95 L190 86 M170 97 L192 104" />
+          </g>
+          <g class="gift__body">
+            <rect x="42" y="96" width="116" height="84" rx="7" class="ln-pink fill-pink" />
+            <path d="M100 96 V180" class="ln-lilac" />
+          </g>
+          <g class="gift__lid">
+            <rect x="32" y="74" width="136" height="24" rx="7" class="ln-pink fill-pink" />
+            <path d="M100 74 V98" class="ln-lilac" />
+            <path d="M100 74 C82 44 56 52 70 68 C78 76 92 76 100 74 Z" class="ln-lilac fill-lilac" />
+            <path d="M100 74 C118 44 144 52 130 68 C122 76 108 76 100 74 Z" class="ln-lilac fill-lilac" />
+            <circle cx="100" cy="74" r="5" class="ln-gold" />
+          </g>
         </g>
         <g class="gift__stars ln-gold thin">
           <path d="M28 46 v10 M23 51 h10" />
@@ -154,6 +169,12 @@
         </svg>
       </button>
 
+      <!-- Gợi ý nhấn giữ: chữ cho chuột hoặc cho cảm ứng tùy thiết bị -->
+      <p class="scene__hint pop">
+        <i class="ph-light ph-hand-pointing" aria-hidden="true"></i>
+        <span class="hint--mouse">Giữ chuột rồi thả</span>
+        <span class="hint--touch">Chạm giữ rồi thả</span>
+      </p>
       <p class="scene__eyebrow pop">chúc mừng ngày phụ nữ việt nam</p>
       <h2 class="scene__title pop" id="sceneTitle"><span class="neon">20/10</span></h2>
       <a class="btn btn--letter pop" href="#letter">
@@ -195,7 +216,7 @@
 
           <div class="paper">
             <p class="paper__greet">Gửi các chị em nhà LightHuman,</p>
-            <p class="paper__text">Bốn người, bốn bông hoa, bốn lời chúc. Đọc từng người bên dưới nhé.</p>
+            <p class="paper__text">LightHuman không chỉ tỏa sáng bởi ánh đèn, mà còn bởi những người phụ nữ tuyệt vời đang hiện diện nơi đây.</p>
             <div class="paper__team" id="paperTeam" aria-hidden="true"></div>
           </div>
 
@@ -209,7 +230,8 @@
               <path class="env__band" d="M0 0 L400 0 L400 55 L387.5 64 L375 55 L362.5 64 L350 55 L337.5 64 L325 55 L312.5 64 L300 55 L287.5 64 L275 55 L262.5 64 L250 55 L237.5 64 L225 55 L212.5 64 L200 55 L187.5 64 L175 55 L162.5 64 L150 55 L137.5 64 L125 55 L112.5 64 L100 55 L87.5 64 L75 55 L62.5 64 L50 55 L37.5 64 L25 55 L12.5 64 L0 55 Z" />
               <path class="env__flap" d="M2 2 L200 46 L398 2" />
             </svg>
-            <span class="env__seal"><i class="ph-light ph-heart"></i></span>
+            <!-- Con dấu niêm thư là biểu tượng LightHuman -->
+            <span class="env__seal"><img src="img/logo-mark.png" width="155" height="91" alt="" /></span>
           </div>
         </div>
 
@@ -228,7 +250,10 @@
   <!-- ===== Ảnh tập thể cả nhà: hai polaroid "rửa ảnh" theo nhịp cuộn ===== -->
   <section class="photo" id="photo" aria-labelledby="photoTitle">
     <div class="photo__track" id="photoTrack">
-      <span class="photo__mark" style="top: 70%" aria-hidden="true"></span>
+      <!-- flash: đúng lúc từng tấm ảnh "rửa" xong; cheer: ăn mừng khi đủ hai tấm -->
+      <span class="photo__mark" data-step="flash" data-shot="1" style="top: 43%" aria-hidden="true"></span>
+      <span class="photo__mark" data-step="flash" data-shot="2" style="top: 66%" aria-hidden="true"></span>
+      <span class="photo__mark" data-step="cheer" style="top: 70%" aria-hidden="true"></span>
       <div class="photo__sticky">
         <h2 class="chapter__title photo__title" id="photoTitle">Và đây là <span class="neon">cả nhà mình</span></h2>
         <div class="polaroids">
@@ -245,9 +270,19 @@
             <figcaption class="polaroid__caption">Chúc mừng 20/10</figcaption>
           </figure>
         </div>
-        <p class="photo__end">Thương cả nhà, <span class="neon">BD Hệ thống</span></p>
+        <p class="photo__thanks">Cảm ơn vì đã làm cho LightHuman trở nên rực rỡ, vui tươi và đầy sức sống hơn mỗi ngày. Chúc mọi người luôn hạnh phúc, xinh đẹp và tỏa sáng theo cách riêng của mình!</p>
+        <p class="photo__end">Mãi iu cả nhà, <span class="neon">BD Hệ thống</span></p>
       </div>
     </div>
+  </section>
+
+  <!-- ===== Kết: các ngôi sao nối thành biểu tượng LightHuman, rồi pháo hoa ===== -->
+  <section class="finale" id="finale" aria-labelledby="finaleTitle">
+    <h2 class="chapter__title" id="finaleTitle">Chòm sao <span class="neon">LightHuman</span></h2>
+    <div class="finale__sky" id="finaleSky" aria-hidden="true">
+      <img src="img/logo-mark.png" width="155" height="91" alt="" />
+    </div>
+    <p class="finale__text">Mỗi ngôi sao là một chị em nhà mình, cùng nhau thắp sáng bầu trời LightHuman.</p>
   </section>
 
   <!-- ===== Thanh tiến trình câu chuyện ===== -->
@@ -258,6 +293,7 @@
       <li><a class="story__dot" href="#letter" data-chapter="letter"><span>Lá thư</span></a></li>
       <li><a class="story__dot" href="#wishesTeam" data-chapter="wishesTeam"><span>Lời chúc</span></a></li>
       <li><a class="story__dot" href="#photo" data-chapter="photo"><span>Ảnh tập thể</span></a></li>
+      <li><a class="story__dot" href="#finale" data-chapter="finale"><span>Chòm sao</span></a></li>
     </ol>
   </nav>
 
